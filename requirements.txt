@@ -1,7 +1,8 @@
-torch>=0.4.1
-torchvision
-tensorboardX
-pillow
+torch==0.4.1
+numpy
+torchvision==0.2
+tensorboardX==1.9
+pillow==6.1.0
 tqdm
 h5py
 scikit-learn
