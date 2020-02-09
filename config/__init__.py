@@ -19,8 +19,8 @@ class Parameters():
                             help="Specify the dataset to use.")
         parser.add_argument("--batch-size", type=int, default=8,
                             help="Number of images sent to the network in one step.")
-        parser.add_argument("--data-dir", type=str, default='/teamscratch/msravcshare/yuyua/deeplab_v3/dataset/cityscapes',
-                            help="Path to the directory containing the PASCAL VOC dataset.")
+        parser.add_argument("--data-dir", type=str, default='./dataset/cityscapes',
+                            help="Path to the directory containing dataset.")
         parser.add_argument("--data-list", type=str, default='./dataset/list/cityscapes/train.lst',
                             help="Path to the file listing the images in the dataset.")
         parser.add_argument("--ignore-label", type=int, default=255,
@@ -49,17 +49,17 @@ class Parameters():
                             help="Whether to randomly scale the inputs during the training.")
         parser.add_argument("--random-seed", type=int, default=304,
                             help="Random seed to have reproducible results.")
-        parser.add_argument("--restore-from", type=str, default='./pretrain_model/MS_DeepLab_resnet_pretrained_COCO_init.pth',
+        parser.add_argument("--restore-from", type=str, default='./pretrained_model/resnet101-imagenet.pth',
                             help="Where restore model parameters from.")
         parser.add_argument("--save-num-images", type=int, default=2,
                             help="How many images to save.")
-        parser.add_argument("--save-pred-every", type=int, default=5000,
+        parser.add_argument("--save-pred-every", type=int, default=1000,
                             help="Save summaries and checkpoint every often.")
-        parser.add_argument("--snapshot-dir", type=str, default='./snapshots_psp_ohem_trainval/',
+        parser.add_argument("--snapshot-dir", type=str, default='./checkpoint/snapshots_psp_ohem_trainval/',
                             help="Where to save snapshots of the model.")
         parser.add_argument("--weight-decay", type=float, default=5e-4,
                             help="Regularisation parameter for L2-loss.")
-        parser.add_argument("--gpu", type=str, default='0',
+        parser.add_argument("--gpu", type=str, default='0,1,2,3',
                             help="choose gpu device.")
 
         parser.add_argument("--ohem-thres", type=float, default=0.6,
@@ -80,7 +80,7 @@ class Parameters():
                             help="choose the samples with correct probability underthe threshold.")
         parser.add_argument("--network", type=str, default='resnet101',
                             help="choose which network to use.")
-        parser.add_argument("--method", type=str, default='base', 
+        parser.add_argument("--method", type=str, default='base_dsn', 
                             help="choose method to train.")
         parser.add_argument("--reduce", action="store_false",
                             help="Whether to use reduce when computing the cross entropy loss.")
@@ -96,7 +96,7 @@ class Parameters():
 
         parser.add_argument("--output-path", type=str, default='./seg_output_eval_set',
                         help="Path to the segmentation map prediction.")
-        parser.add_argument("--store-output", type=str, default='False',
+        parser.add_argument("--store-output", type=str, default='True',
                         help="whether store the predicted segmentation map.")
         parser.add_argument("--use-flip", type=str, default='False',
                         help="whether use test-stage flip.")
@@ -111,7 +111,7 @@ class Parameters():
                             help="Number of the initial staring epochs.")
         parser.add_argument("--end-epochs", type=int, default=120,
                             help="Number of the overall training epochs.")
-        parser.add_argument("--save-epoch", type=int, default=20,
+        parser.add_argument("--save-epoch", type=int, default=10,
                             help="Save summaries and checkpoint every often.")
         parser.add_argument("--criterion", type=str, default='ce',
                         help="Specify the specific criterion/loss functions to use.")
