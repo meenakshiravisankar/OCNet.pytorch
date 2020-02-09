@@ -1,7 +1,7 @@
 # check the enviroment info
 nvidia-smi
 # pytorch 04
-PYTHON="/root/miniconda3/bin/python"
+PYTHON="python3"
 
 
 #network config

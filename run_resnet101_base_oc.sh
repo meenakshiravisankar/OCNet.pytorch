@@ -1,6 +1,6 @@
 # check the enviroment info
 nvidia-smi
-PYTHON="/root/miniconda3/bin/python"
+PYTHON="python3"
 
 #network config
 NETWORK="resnet101"
