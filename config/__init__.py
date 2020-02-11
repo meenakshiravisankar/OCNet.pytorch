@@ -80,7 +80,7 @@ class Parameters():
                             help="choose the samples with correct probability underthe threshold.")
         parser.add_argument("--network", type=str, default='resnet101',
                             help="choose which network to use.")
-        parser.add_argument("--method", type=str, default='base_dsn', 
+        parser.add_argument("--method", type=str, default='base_oc_dsn', 
                             help="choose method to train.")
         parser.add_argument("--reduce", action="store_false",
                             help="Whether to use reduce when computing the cross entropy loss.")
