@@ -17,7 +17,7 @@ class Parameters():
         parser = argparse.ArgumentParser(description="Pytorch Segmentation Network")
         parser.add_argument("--dataset", type=str, default="cityscapes_train",
                             help="Specify the dataset to use.")
-        parser.add_argument("--batch-size", type=int, default=8,
+        parser.add_argument("--batch-size", type=int, default=4,
                             help="Number of images sent to the network in one step.")
         parser.add_argument("--data-dir", type=str, default='./dataset/cityscapes',
                             help="Path to the directory containing dataset.")
@@ -58,7 +58,7 @@ class Parameters():
         parser.add_argument("--snapshot-dir", type=str, default='./checkpoint/snapshots_psp_ohem_trainval/',
                             help="Where to save snapshots of the model.")
         parser.add_argument("--weight-decay", type=float, default=5e-4,
-                            help="Regularisation parameter for L2-loss.")
+                            help="Regularisation parameter forL2-loss.")
         parser.add_argument("--gpu", type=str, default='0,1,2,3',
                             help="choose gpu device.")
 
