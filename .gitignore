@@ -5,3 +5,4 @@ pretrained_model/
 *.pyc
 *.pth
 *.pth.tar
+*_oc_dsn/
