@@ -6,3 +6,5 @@ pretrained_model/
 *.pth
 *.pth.tar
 *_oc_dsn/
+.ipynb_checkpoints
+*.ipynb
