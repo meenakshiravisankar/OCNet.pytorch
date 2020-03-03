@@ -42,10 +42,10 @@ class Ade20kSegmentationTrain(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {}
-        (self.id_to_trainid)[0] = ignore_label
+        self.id_to_trainid = {0 : ignore_label}
         for i in range(1, 151):
             (self.id_to_trainid)[i] = i
+
         print('{} images are loaded!'.format(len(self.img_ids)))
 
     def __len__(self):
@@ -152,8 +152,7 @@ class Ade20kSegmentationTest(data.Dataset):
                 "img": img_file,
                 "name": name
             })
-        self.id_to_trainid = {}
-        (self.id_to_trainid)[0] = ignore_label
+        self.id_to_trainid = {0 : ignore_label}
         for i in range(1, 151):
             (self.id_to_trainid)[i] = i
 
@@ -245,8 +244,7 @@ class Ade20kSegmentationTrainWpath(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {}
-        (self.id_to_trainid)[0] = ignore_label
+        self.id_to_trainid = {0 : ignore_label}
         for i in range(1, 151):
             (self.id_to_trainid)[i] = i
         print('{} images are loaded!'.format(len(self.img_ids)))
