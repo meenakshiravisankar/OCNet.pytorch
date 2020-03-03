@@ -53,7 +53,7 @@ class Parameters():
                             help="Where restore model parameters from.")
         parser.add_argument("--save-num-images", type=int, default=2,
                             help="How many images to save.")
-        parser.add_argument("--save-pred-every", type=int, default=1000,
+        parser.add_argument("--save-pred-every", type=int, default=5000,
                             help="Save summaries and checkpoint every often.")
         parser.add_argument("--snapshot-dir", type=str, default='./checkpoint/snapshots_psp_ohem_trainval/',
                             help="Where to save snapshots of the model.")

@@ -46,7 +46,6 @@ class Ade20kSegmentationTrain(data.Dataset):
         (self.id_to_trainid)[0] = ignore_label
         for i in range(1, 151):
             (self.id_to_trainid)[i] = i
-        
         print('{} images are loaded!'.format(len(self.img_ids)))
 
     def __len__(self):
@@ -82,7 +81,6 @@ class Ade20kSegmentationTrain(data.Dataset):
         if self.scale:
             image, label = self.generate_scale_label(image, label)
         image = np.asarray(image, np.float32)
-        
 
         if self.network == "resnet101":
             mean = (102.9801, 115.9465, 122.7717)
@@ -106,8 +104,8 @@ class Ade20kSegmentationTrain(data.Dataset):
 
         img_h, img_w = label.shape
         crop_size = random.choice([300, 375, 450, 525, 600])
-        self.crop_h = crop_size
-        self.crop_w = crop_size
+        #self.crop_h = crop_size
+        #self.crop_w = crop_size
         pad_h = max(self.crop_h - img_h, 0)
         pad_w = max(self.crop_w - img_w, 0)
         if pad_h > 0 or pad_w > 0:
@@ -119,7 +117,6 @@ class Ade20kSegmentationTrain(data.Dataset):
                 value=(self.ignore_label,))
         else:
             img_pad, label_pad = image, label
-
         img_h, img_w = label_pad.shape
         h_off = random.randint(0, img_h - self.crop_h)
         w_off = random.randint(0, img_w - self.crop_w)
@@ -203,8 +200,8 @@ class Ade20kSegmentationTest(data.Dataset):
 
         img_h, img_w, _ = image.shape
         crop_size = random.choice([300, 375, 450, 525, 600])
-        self.crop_h = crop_size
-        self.crop_w = crop_size
+        #self.crop_h = crop_size
+        #self.crop_w = crop_size
         pad_h = max(self.crop_h - img_h, 0)
         pad_w = max(self.crop_w - img_w, 0)
         if pad_h > 0 or pad_w > 0:
@@ -312,8 +309,8 @@ class Ade20kSegmentationTrainWpath(data.Dataset):
 
         img_h, img_w = label.shape
         crop_size = random.choice([300, 375, 450, 525, 600])
-        self.crop_h = crop_size
-        self.crop_w = crop_size
+        #self.crop_h = crop_size
+        #self.crop_w = crop_size
         pad_h = max(self.crop_h - img_h, 0)
         pad_w = max(self.crop_w - img_w, 0)
         if pad_h > 0 or pad_w > 0:
