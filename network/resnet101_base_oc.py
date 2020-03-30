@@ -67,7 +67,7 @@ class ResNet(nn.Module):
             nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1),
             InPlaceABNSync(512),
             BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
-            dropout=0.05, sizes=([2]))
+            dropout=0.05, sizes=([1]))
             )
         self.cls = nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
         self.dsn = nn.Sequential(
