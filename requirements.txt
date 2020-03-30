@@ -8,3 +8,4 @@ h5py
 scikit-learn
 matplotlib==3.0
 opencv-python
+mlflow
