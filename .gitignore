@@ -8,3 +8,4 @@ pretrained_model/
 *_oc_dsn/
 .ipynb_checkpoints
 *.ipynb
+mlruns/

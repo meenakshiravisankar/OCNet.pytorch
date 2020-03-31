@@ -44,7 +44,7 @@ mkdir -p ${CHECKPOINT_DIR}
 ########################################################################################################################
 #  Training
 ########################################################################################################################
-$PYTHON -u train.py --experiment-name $EXPERIMENT_NAME --source-version $SOURCE_VERSION--network $NETWORK --method $METHOD --random-mirror --random-scale --gpu 0,1,2,3 --batch-size $BATCHSIZE \
+$PYTHON -u train.py --experiment-name $EXPERIMENT_NAME --source-version $SOURCE_VERSION --network $NETWORK --method $METHOD --random-mirror --random-scale --gpu 0,1,2,3 --batch-size $BATCHSIZE \
   --snapshot-dir $SNAPSHOT_DIR  --num-steps $MAX_ITERS --ohem $USE_OHEM --data-list $DATA_LIST_PATH --weight-decay $WEIGHT_DECAY \
   --input-size $INPUT_SIZE --ohem-thres $OHEMTHRES --ohem-keep $OHEMKEEP --use-val $USE_VAL_SET --use-weight $USE_CLASS_BALANCE \
   --snapshot-dir $SNAPSHOT_DIR --restore-from $RESTORE_FROM --start-iters $START_ITERS --learning-rate $LEARNING_RATE  \

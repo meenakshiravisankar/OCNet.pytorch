@@ -42,8 +42,8 @@ start = timeit.default_timer()
 args = Parameters().parse()
 
 # mlflow to log
-exp_id = mlflow.create_experiment(args.experiment_name)
-mlflow.start_run(experiment_id=exp_id, source_version=args.source_version)
+exp_id = mlflow.set_experiment(args.experiment_name)
+mlflow.start_run(experiment_id=exp_id)
 mlflow.log_param("train_configs", vars(args))
 
 def lr_poly(base_lr, iter, max_iter, power):
@@ -164,7 +164,7 @@ def main():
             writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
         print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss.data.cpu().numpy()))
         # mlflow logging
-        mlflow.log_metric(key="loss", value=loss.data.cpu().numpy(), step=int(i_iter))
+        mlflow.log_metric(key="loss", value=float(loss.data.cpu().numpy()), step=int(i_iter))
         mlflow.log_metric(key="learning_rate", value=lr, step=int(i_iter))
 
         if i_iter >= args.num_steps-1:
