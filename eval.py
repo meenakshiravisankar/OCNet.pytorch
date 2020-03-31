@@ -33,6 +33,7 @@ import scipy.ndimage as nd
 from math import ceil
 from PIL import Image as PILImage
 
+import mlflow
 import matplotlib.pyplot as plt
 import torch.nn as nn
 
@@ -259,8 +260,10 @@ def main():
     """Create the model and start the evaluation process."""
     args = Parameters().parse()
 
-    # file_log = open(args.log_file, "w")
-    # sys.stdout = sys.stderr = file_log
+    # mlflow to log
+    exp_id = mlflow.create_experiment(args.experiment_name)
+    mlflow.start_run(experiment_id=exp_id, source_version=args.source_version)
+    mlflow.log_param("train_configs", vars(args))
 
     print("Input arguments:")
     sys.stdout.flush()
@@ -357,7 +360,7 @@ def main():
                 output_im = PILImage.fromarray(seg_pred[i])
                 output_im.putpalette(palette)
                 output_im.save(output_path+'/'+name[i]+'.png')
-
+                mlflow.log_artifact(output_path+'/'+name[i]+'.png')
         seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
         ignore_index = seg_gt != 255
         seg_gt = seg_gt[ignore_index]
@@ -375,7 +378,11 @@ def main():
 
     print("confusion matrix\n")
     print(confusion_matrix)
+    mlflow.log_param("mean_iu", mean_IU)
+    mlflow.log_param("iu_array", IU_array)
+    mlflow.log_param("confusion_matrix", confusion_matrix)
     sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
+    mlflow.end_run()

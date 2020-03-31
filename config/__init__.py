@@ -15,6 +15,10 @@ def str2bool(v):
 class Parameters():
     def __init__(self):
         parser = argparse.ArgumentParser(description="Pytorch Segmentation Network")
+        parser.add_argument("--experiment-name", type=str, 
+                            help="Specify the name of experiment")
+        parser.add_argument("--source-version", type=str,
+                            help="Specify the hash of git commit")
         parser.add_argument("--dataset", type=str, default="cityscapes_train",
                             help="Specify the dataset to use.")
         parser.add_argument("--batch-size", type=int, default=4,
