@@ -1,6 +1,13 @@
 # OCNet: Object Context Network for Scene Parsing (pytorch) 
-
-
+### Usage for training
+```
+bash run_cityscapes_train.sh <mlflow-expname> <git-commit-hash>
+```
+### Usage for evaluating
+```
+bash run_cityscapes_eval.sh <mlflow-expname> <git-commit-hash> <train/val/test>
+```
+<!-- 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/object-contextual-representations-for/semantic-segmentation-on-coco-stuff-test)](https://paperswithcode.com/sota/semantic-segmentation-on-coco-stuff-test?p=object-contextual-representations-for)
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/object-contextual-representations-for/semantic-segmentation-on-pascal-context)](https://paperswithcode.com/sota/semantic-segmentation-on-pascal-context?p=object-contextual-representations-for)
@@ -275,4 +282,4 @@ This project is created based on the reproduced Deeplabv3, PSPNet (pytorch) prov
 
 [semantic-segmentation-pytorch](https://github.com/CSAILVision/semantic-segmentation-pytorch)
 
-
+ -->
