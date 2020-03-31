@@ -1,11 +1,11 @@
 # OCNet: Object Context Network for Scene Parsing (pytorch) 
 ### Usage for training
 ```
-bash run_cityscapes_train.sh <mlflow-expname> <git-commit-hash>
+bash run_cityscapes_train.sh <mlflow-expname>
 ```
 ### Usage for evaluating
 ```
-bash run_cityscapes_eval.sh <mlflow-expname> <git-commit-hash> <train/val/test>
+bash run_cityscapes_eval.sh <mlflow-expname> <train/val/test>
 ```
 <!-- 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/object-contextual-representations-for/semantic-segmentation-on-coco-stuff-test)](https://paperswithcode.com/sota/semantic-segmentation-on-coco-stuff-test?p=object-contextual-representations-for)

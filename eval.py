@@ -261,8 +261,8 @@ def main():
     args = Parameters().parse()
 
     # mlflow to log
-    exp_id = mlflow.create_experiment(args.experiment_name)
-    mlflow.start_run(experiment_id=exp_id, source_version=args.source_version)
+    exp_id = mlflow.set_experiment(args.experiment_name)
+    mlflow.start_run(experiment_id=exp_id)
     mlflow.log_param("train_configs", vars(args))
 
     print("Input arguments:")
