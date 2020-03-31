@@ -32,6 +32,7 @@ import logging
 import pdb
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
+import mlflow
 from utils.criterion import CriterionCrossEntropy,  CriterionDSN, CriterionOhemDSN, CriterionOhemDSN_single
 from utils.parallel import DataParallelModel, DataParallelCriterion
 
@@ -40,8 +41,10 @@ start = timeit.default_timer()
 
 args = Parameters().parse()
 
-# file_log = open(args.log_file, "w")
-# sys.stdout = sys.stderr = file_log
+# mlflow to log
+exp_id = mlflow.create_experiment(args.experiment_name)
+mlflow.start_run(experiment_id=exp_id, source_version=args.source_version)
+mlflow.log_param("train_configs", vars(args))
 
 def lr_poly(base_lr, iter, max_iter, power):
     return base_lr*((1-float(iter)/max_iter)**(power))
@@ -160,18 +163,21 @@ def main():
             writer.add_scalar('learning_rate', lr, i_iter)
             writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
         print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss.data.cpu().numpy()))
-
+        # mlflow logging
+        mlflow.log_metric(key="loss", value=loss.data.cpu().numpy(), step=i_iter)
         if i_iter >= args.num_steps-1:
             print('save model ...')
             torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(args.num_steps)+'.pth'))
+            mlflow.log_artifact(osp.join(args.snapshot_dir, 'CS_scenes_'+str(args.num_steps)+'.pth'))
             break
 
         if i_iter % args.save_pred_every == 0:
             print('taking snapshot ...')
-            torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(i_iter)+'.pth'))     
+            torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(i_iter)+'.pth'))
+            mlflow.log_artifact(osp.join(args.snapshot_dir, 'CS_scenes_'+str(i_iter)+'.pth'))     
 
     end = timeit.default_timer()
     print(end-start,'seconds')
-
+    mlflow.end_run()
 if __name__ == '__main__':
     main()
