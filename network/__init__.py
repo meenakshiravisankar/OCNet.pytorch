@@ -9,7 +9,7 @@ networks = {
     'resnet101_base_oc_dsn': get_resnet101_base_oc_dsn,
     'resnet101_pyramid_oc_dsn': get_resnet101_pyramid_oc_dsn,
     'resnet101_asp_oc_dsn': get_resnet101_asp_oc_dsn,
-    'resnet101_interlaced' : get_resnet101_interlaced_dsn
+    'resnet101_interlaced_dsn' : get_resnet101_interlaced_dsn
 }
 
 def get_segmentation_model(name, **kwargs):
