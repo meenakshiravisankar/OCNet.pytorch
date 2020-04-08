@@ -47,12 +47,21 @@ class InterlacedSparseAttention(nn.Module):
         self.P_w = P_w
         self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
             dropout=0.05, sizes=([1]))
-    
+
     def forward(self, x):
         N, C, H, W = x.size()
         Q_h, Q_w = H // self.P_h, W // self.P_w
+        pad_h, pad_w = self.P_h - (H - self.P_h * Q_h), self.P_w - (W - self.P_w * Q_w)
+        pad_top, pad_bottom = pad_h//2, pad_h-pad_h//2
+        pad_left, pad_right = pad_w//2, pad_w-pad_w//2
+        pad = nn.ZeroPad2d((pad_left, pad_right, pad_top, pad_bottom))
+        x = pad(x)
+        if pad_left + pad_right != 0:
+            Q_w += 1
+        if pad_top + pad_bottom != 0:
+            Q_h += 1
         x = x.view(N, C, Q_h, self.P_h, Q_w, self.P_w)
-
+        print(x.size())
         # Long-range Attention
         x = x.permute(0,3,5,1,2,4)
         x = x.view(N * self.P_h * self.P_w, C, Q_h, Q_w)
