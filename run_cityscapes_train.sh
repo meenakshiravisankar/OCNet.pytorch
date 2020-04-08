@@ -6,7 +6,7 @@ PYTHON="python3"
 
 #network config
 NETWORK="resnet101"
-METHOD="asp_oc_dsn"
+METHOD="interlaced_dsn"
 DATASET="cityscapes_train"
 
 #training settings

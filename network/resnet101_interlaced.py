@@ -60,10 +60,11 @@ class InterlacedSparseAttention(nn.Module):
             Q_w += 1
         if pad_top + pad_bottom != 0:
             Q_h += 1
+        N, C, H, W = x.size()
         x = x.view(N, C, Q_h, self.P_h, Q_w, self.P_w)
-        print(x.size())
         # Long-range Attention
         x = x.permute(0,3,5,1,2,4)
+        x = x.contiguous()
         x = x.view(N * self.P_h * self.P_w, C, Q_h, Q_w)
         x = self.attention(x)
         x = x.view(N, self.P_h, self.P_w, C, Q_h, Q_w)
@@ -73,7 +74,9 @@ class InterlacedSparseAttention(nn.Module):
         x = x.view(N * Q_h * Q_w, C, self.P_h, self.P_w)
         x = self.attention(x)
         x = x.view(N, Q_h, Q_w, C, self.P_h, self.P_w)
-        return x
+        x = x.permute(0,3,1,4,2,5)
+        x = x.contiguous()
+        return x.view(N,C,H,W)
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
