@@ -27,6 +27,7 @@ sys.path.append(os.path.join(BASE_DIR, '../utils'))
 from resnet_block import conv3x3, Bottleneck
 sys.path.append(os.path.join(BASE_DIR, '../oc_module'))
 from base_oc_block import BaseOC_Module
+from pyramid_oc_block import Pyramid_OC_Module
 
 torch_ver = torch.__version__[:3]
 
@@ -45,34 +46,35 @@ class InterlacedSparseAttention(nn.Module):
         super(InterlacedSparseAttention, self).__init__()
         self.P_h = P_h
         self.P_w = P_w
-        self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
-            dropout=0.05, sizes=([1]))
-
+        # self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
+        #     dropout=0.05, sizes=([1]))
+        
     def forward(self, x):
         N, C, H, W = x.size()
         Q_h, Q_w = H // self.P_h, W // self.P_w
-        pad_h, pad_w = self.P_h - (H - self.P_h * Q_h), self.P_w - (W - self.P_w * Q_w)
-        pad_top, pad_bottom = pad_h//2, pad_h-pad_h//2
-        pad_left, pad_right = pad_w//2, pad_w-pad_w//2
-        pad = nn.ZeroPad2d((pad_left, pad_right, pad_top, pad_bottom))
-        x = pad(x)
-        if pad_left + pad_right != 0:
-            Q_w += 1
-        if pad_top + pad_bottom != 0:
-            Q_h += 1
-        N, C, H, W = x.size()
+        # pad_h, pad_w = self.P_h - (H - self.P_h * Q_h), self.P_w - (W - self.P_w * Q_w)
+        # pad_top, pad_bottom = pad_h//2, pad_h-pad_h//2
+        # pad_left, pad_right = pad_w//2, pad_w-pad_w//2
+        # pad = nn.ZeroPad2d((pad_left, pad_right, pad_top, pad_bottom))
+        # x = pad(x)
+        # if pad_left + pad_right != 0:
+            # Q_w += 1
+        # if pad_top + pad_bottom != 0:
+            # Q_h += 1
+        # N, C, H, W = x.size()
         x = x.view(N, C, Q_h, self.P_h, Q_w, self.P_w)
         # Long-range Attention
         x = x.permute(0,3,5,1,2,4)
         x = x.contiguous()
         x = x.view(N * self.P_h * self.P_w, C, Q_h, Q_w)
-        x = self.attention(x)
+        attention = Pyramid_OC_Module(in_channels=512, out_channels=512, dropout=0.05, sizes=([P_w]))
+        x = attention(x)
         x = x.view(N, self.P_h, self.P_w, C, Q_h, Q_w)
 
         # Short-range Attention
         x = x.permute(0,4,5,3,1,2)
         x = x.view(N * Q_h * Q_w, C, self.P_h, self.P_w)
-        x = self.attention(x)
+        x = attention(x)
         x = x.view(N, Q_h, Q_w, C, self.P_h, self.P_w)
         x = x.permute(0,3,1,4,2,5)
         x = x.contiguous()
