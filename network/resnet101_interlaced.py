@@ -26,7 +26,7 @@ sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
 from resnet_block import conv3x3, Bottleneck
 sys.path.append(os.path.join(BASE_DIR, '../oc_module'))
-from base_oc_block import BaseOC_Module
+from base_oc_block_interlaced import BaseOC_Module
 from pyramid_oc_block import Pyramid_OC_Module
 
 torch_ver = torch.__version__[:3]
@@ -46,10 +46,21 @@ class InterlacedSparseAttention(nn.Module):
         super(InterlacedSparseAttention, self).__init__()
         self.P_h = P_h
         self.P_w = P_w
-        self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
-                                       dropout=0.05, sizes=([1]))
+        self.in_channels = 512
+        self.out_channels=512
+        self.key_channels=256
+        self.value_channels=256 
+        self.dropout=0.05
+        self.attention = BaseOC_Module(self.in_channels, self.out_channels, self.key_channels, self.value_channels, 
+                                       self.dropout, sizes=([1]))
+        self.conv_bn_dropout = nn.Sequential(
+            nn.Conv2d(2*self.in_channels, self.out_channels, kernel_size=1, padding=0),
+            InPlaceABNSync(self.out_channels),
+            nn.Dropout2d(self.dropout)
+            )
         
     def forward(self, x):
+        x_input = x
         N, C, H, W = x.size()
         Q_h, Q_w = H // self.P_h, W // self.P_w
         pad_h, pad_w = self.P_h - (H - self.P_h * Q_h), self.P_w - (W - self.P_w * Q_w)
@@ -74,8 +85,9 @@ class InterlacedSparseAttention(nn.Module):
         x = x.reshape(N * Q_h * Q_w, C, self.P_h, self.P_w)
         x = self.attention(x)
         x = x.reshape(N, Q_h, Q_w, C, self.P_h, self.P_w)
-        x = x.permute(0,3,1,4,2,5)
-        return x.reshape(N,C,H,W)
+        x = x.permute(0,3,1,4,2,5).reshape(N,C,H,W)
+        x = self.conv_bn_dropout(torch.cat([x, x_input], 1))
+        return x
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
