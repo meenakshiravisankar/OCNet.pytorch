@@ -60,10 +60,9 @@ class InterlacedSparseAttention(nn.Module):
             )
         
     def forward(self, x):
-        x_input = x
         N, C, H, W = x.size()
         Q_h, Q_w = H // self.P_h, W // self.P_w
-        pad_h, pad_w = self.P_h - (H - self.P_h * Q_h), self.P_w - (W - self.P_w * Q_w)
+        pad_h, pad_w = (self.P_h - (H - self.P_h * Q_h)) % self.P_h, (self.P_w - (W - self.P_w * Q_w)) % self.P_w
         pad_top, pad_bottom = pad_h//2, pad_h-pad_h//2
         pad_left, pad_right = pad_w//2, pad_w-pad_w//2
         pad = nn.ZeroPad2d((pad_left, pad_right, pad_top, pad_bottom))
@@ -72,6 +71,7 @@ class InterlacedSparseAttention(nn.Module):
             Q_w += 1
         if pad_top + pad_bottom != 0:
             Q_h += 1
+        x_input = x
         N, C, H, W = x.size()
         x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
         # Long-range Attention
