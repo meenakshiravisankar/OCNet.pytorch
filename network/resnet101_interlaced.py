@@ -48,7 +48,6 @@ class InterlacedSparseAttention(nn.Module):
         self.P_w = P_w
         self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
                                        dropout=0.05, sizes=([1]))
-        self.context = Pyramid_OC_Module(in_channels=512, out_channels=512, dropout=0.05, sizes=([8]))
 
     def forward(self, x):
         N, C, H, W = x.size()
@@ -81,15 +80,17 @@ class InterlacedSparseAttention(nn.Module):
         x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
         x = x.permute(0,1,3,2,5,4)
         x = x.reshape(N, C, self.P_h*Q_h, self.P_w*Q_w)
-        x = self.context(x)
+        context = Pyramid_OC_Module(in_channels=512, out_channels=512, dropout=0.05, sizes=([self.P_h]))
+        x = context(x)
 
         # Short-range Attention
         x = x.reshape(N, C, self.P_h, Q_h, self.P_w, Q_w)
         x = x.permute(0,1,3,2,5,4)
         x = x.reshape(N, C, self.P_h*Q_h, self.P_w*Q_w)
-        x = self.context(x)
+        context = Pyramid_OC_Module(in_channels=512, out_channels=512, dropout=0.05, sizes=([Q_h]))
+        x = context(x)
         return x
-        
+
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
         self.inplanes = 128
