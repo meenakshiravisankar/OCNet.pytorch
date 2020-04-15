@@ -48,7 +48,8 @@ class InterlacedSparseAttention(nn.Module):
         self.P_w = P_w
         self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
                                        dropout=0.05, sizes=([1]))
-        
+        self.context = Pyramid_OC_Module(in_channels=512, out_channels=512, dropout=0.05, sizes=([8]))
+
     def forward(self, x):
         N, C, H, W = x.size()
         Q_h, Q_w = H // self.P_h, W // self.P_w
@@ -62,21 +63,33 @@ class InterlacedSparseAttention(nn.Module):
         if pad_top + pad_bottom != 0:
             Q_h += 1
         N, C, H, W = x.size()
-        x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
+        # x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
+        # # Long-range Attention
+        # x = x.permute(0,3,5,1,2,4)
+        # x = x.reshape(N * self.P_h * self.P_w, C, Q_h, Q_w)
+        # x = self.attention(x)
+        # x = x.reshape(N, self.P_h, self.P_w, C, Q_h, Q_w)
+
+        # # Short-range Attention
+        # x = x.permute(0,4,5,3,1,2)
+        # x = x.reshape(N * Q_h * Q_w, C, self.P_h, self.P_w)
+        # x = self.attention(x)
+        # x = x.reshape(N, Q_h, Q_w, C, self.P_h, self.P_w)
+        # x = x.permute(0,3,1,4,2,5)
+        # return x.reshape(N,C,H,W)
         # Long-range Attention
-        x = x.permute(0,3,5,1,2,4)
-        x = x.reshape(N * self.P_h * self.P_w, C, Q_h, Q_w)
-        x = self.attention(x)
-        x = x.reshape(N, self.P_h, self.P_w, C, Q_h, Q_w)
+        x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
+        x = x.permute(0,1,3,2,5,4)
+        x = x.reshape(N, C, self.P_h*Q_h, self.P_w*Q_w)
+        x = self.context(x)
 
         # Short-range Attention
-        x = x.permute(0,4,5,3,1,2)
-        x = x.reshape(N * Q_h * Q_w, C, self.P_h, self.P_w)
-        x = self.attention(x)
-        x = x.reshape(N, Q_h, Q_w, C, self.P_h, self.P_w)
-        x = x.permute(0,3,1,4,2,5)
-        return x.reshape(N,C,H,W)
-
+        x = x.reshape(N, C, self.P_h, Q_h, self.P_w, Q_w)
+        x = x.permute(0,1,3,2,5,4)
+        x = x.reshape(N, C, self.P_h*Q_h, self.P_w*Q_w)
+        x = self.context(x)
+        return x
+        
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
         self.inplanes = 128
