@@ -47,7 +47,7 @@ class InterlacedSparseAttention(nn.Module):
         self.P_h = P_h
         self.P_w = P_w
         self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
-                                       dropout=0, sizes=([2]))
+                                       dropout=0.05, sizes=([1]))
 
     def forward(self, x):
         N, C, H, W = x.size()
@@ -108,7 +108,7 @@ class ResNet(nn.Module):
         self.dsn = nn.Sequential(
             nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=1),
             InPlaceABNSync(512),
-            nn.Dropout2d(0.1),
+            nn.Dropout2d(0.05),
             nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
             )
 
