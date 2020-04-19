@@ -26,8 +26,7 @@ sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, '../utils'))
 from resnet_block import conv3x3, Bottleneck
 sys.path.append(os.path.join(BASE_DIR, '../oc_module'))
-from base_oc_block import BaseOC_Module
-from pyramid_oc_block import Pyramid_OC_Module
+from base_oc_block_interlaced import ISA_Module
 
 torch_ver = torch.__version__[:3]
 
@@ -40,42 +39,6 @@ elif torch_ver == '0.3':
     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
     from modules import InPlaceABNSync
     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')    
-
-class InterlacedSparseAttention(nn.Module):
-    def __init__(self, P_h, P_w):
-        super(InterlacedSparseAttention, self).__init__()
-        self.P_h = P_h
-        self.P_w = P_w
-        self.attention = BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
-                                       dropout=0.05, sizes=([1]))
-
-    def forward(self, x):
-        N, C, H, W = x.size()
-        Q_h, Q_w = H // self.P_h, W // self.P_w
-        pad_h, pad_w = (self.P_h - (H - self.P_h * Q_h)) % self.P_h, (self.P_w - (W - self.P_w * Q_w)) % self.P_w
-        pad_top, pad_bottom = pad_h//2, pad_h-pad_h//2
-        pad_left, pad_right = pad_w//2, pad_w-pad_w//2
-        pad = nn.ZeroPad2d((pad_left, pad_right, pad_top, pad_bottom))
-        x = pad(x)
-        if pad_left + pad_right != 0:
-            Q_w += 1
-        if pad_top + pad_bottom != 0:
-            Q_h += 1
-        N, C, H, W = x.size()
-        x = x.reshape(N, C, Q_h, self.P_h, Q_w, self.P_w)
-        # Long-range Attention
-        x = x.permute(0,3,5,1,2,4)
-        x = x.reshape(N * self.P_h * self.P_w, C, Q_h, Q_w)
-        x = self.attention(x)
-        x = x.reshape(N, self.P_h, self.P_w, C, Q_h, Q_w)
-
-        # Short-range Attention
-        x = x.permute(0,4,5,3,1,2)
-        x = x.reshape(N * Q_h * Q_w, C, self.P_h, self.P_w)
-        x = self.attention(x)
-        x = x.reshape(N, Q_h, Q_w, C, self.P_h, self.P_w)
-        x = x.permute(0,3,1,4,2,5)
-        return x.reshape(N,C,H,W)
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
@@ -100,13 +63,14 @@ class ResNet(nn.Module):
 
         # extra added layers
         self.context = nn.Sequential(
-            nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1, bias=False),
             InPlaceABNSync(512),
-            InterlacedSparseAttention(P_h=8, P_w=8)
+            ISA_Module(in_channels=512, key_channels=256, value_channels=512,
+                       out_channels=512, down_factors=[[8,8]], dropout=0.05),
             )
         self.cls = nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
         self.dsn = nn.Sequential(
-            nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=1, bias=False),
             InPlaceABNSync(512),
             nn.Dropout2d(0.05),
             nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
