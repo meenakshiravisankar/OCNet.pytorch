@@ -115,9 +115,9 @@ def main():
                 print('use ohem only for the second prediction map.')
                 criterion = CriterionOhemDSN_single(thres=args.ohem_thres, min_kept=args.ohem_keep, dsn_weight=float(args.dsn_weight))
             else:
-                criterion = CriterionOhemDSN(thres=args.ohem_thres, min_kept=args.ohem_keep, dsn_weight=float(args.dsn_weight), use_weight=True)
+                criterion = CriterionOhemDSN(thres=args.ohem_thres, min_kept=args.ohem_keep, dsn_weight=float(args.dsn_weight), use_weight=False)
         else:
-            criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=True)
+            criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=False)
 
 
     criterion = DataParallelCriterion(criterion)
