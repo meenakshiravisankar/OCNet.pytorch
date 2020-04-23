@@ -50,9 +50,9 @@ class IddSegmentationTrain(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {255 : ignore_label}
+        self.id_to_trainid = {-1 : ignore_label}
         for i in range(26):
-            (self.id_to_trainid)[i] = 255
+            (self.id_to_trainid)[i] = i
 
         print('{} images are loaded!'.format(len(self.img_ids)))
 

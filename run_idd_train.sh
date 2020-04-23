@@ -8,7 +8,7 @@ PYTHON="python3"
 NETWORK="resnet101"
 METHOD="interlaced_dsn"
 DATASET="idd_train"
-NUM_CLASSES=19
+NUM_CLASSES=26
 
 #training settings
 LEARNING_RATE=1e-2
