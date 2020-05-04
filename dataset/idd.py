@@ -26,7 +26,7 @@ import torchvision.transforms as transforms
 
 class IddSegmentationTrain(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=255, use_aug=False, network="renset101"):
+        scale=True, mirror=True, ignore_label=26, use_aug=False, network="renset101"):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -139,7 +139,7 @@ class IddSegmentationTrain(data.Dataset):
 
 class IddSegmentationTest(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=255, network=None):
+        scale=True, mirror=True, ignore_label=26, network=None):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -225,7 +225,7 @@ class IddSegmentationTest(data.Dataset):
 
 class IddSegmentationTrainWpath(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=255, use_aug=False, network=None):
+        scale=True, mirror=True, ignore_label=26, use_aug=False, network=None):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
