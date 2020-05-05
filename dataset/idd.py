@@ -47,7 +47,7 @@ class IddSegmentationTrain(data.Dataset):
             self.files.append({
                 "img": img_file,
                 "label": label_file,
-                "name": name,
+                "name": label_path,
                 "weight": 1
             })
         self.id_to_trainid = {-1 : ignore_label, 255 : 26}
@@ -159,7 +159,7 @@ class IddSegmentationTest(data.Dataset):
                 "img": img_file,
                 "name": name
             })
-        self.id_to_trainid = {255 : ignore_label}
+        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
         for i in range(26):
             (self.id_to_trainid)[i] = i
 
@@ -249,7 +249,7 @@ class IddSegmentationTrainWpath(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {255 : ignore_label}
+        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
         for i in range(26):
             (self.id_to_trainid)[i] = i
         print('{} images are loaded!'.format(len(self.img_ids)))

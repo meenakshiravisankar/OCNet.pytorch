@@ -39,7 +39,7 @@ import torch.nn as nn
 
 torch_ver = torch.__version__[:3]
 
-
+# TODO : change to idd
 def get_palette(num_cls):
     """ Returns the color map for visualizing the segmentation mask.
     Args:
@@ -279,13 +279,10 @@ def main():
 
     deeplab = get_segmentation_model("_".join([args.network, args.method]), num_classes=args.num_classes)
 
-    ignore_label = 255
-    id_to_trainid = {-1: ignore_label, 0: ignore_label, 1: ignore_label, 2: ignore_label,
-          3: ignore_label, 4: ignore_label, 5: ignore_label, 6: ignore_label,
-          7: 0, 8: 1, 9: ignore_label, 10: ignore_label, 11: 2, 12: 3, 13: 4,
-          14: ignore_label, 15: ignore_label, 16: ignore_label, 17: 5,
-          18: ignore_label, 19: 6, 20: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14,
-          28: 15, 29: ignore_label, 30: ignore_label, 31: 16, 32: 17, 33: 18}
+    ignore_label = args.ignore_label
+    id_to_trainid = {-1: ignore_label, 255: ignore_label}
+    for i in range(args.num_classes):
+        id_to_trainid[i] = i
 
 
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu
@@ -299,7 +296,7 @@ def main():
 
 
     testloader = data.DataLoader(get_segmentation_dataset(args.dataset, root=args.data_dir, list_path=args.data_list, 
-                                    crop_size=(1024, 2048), scale=False, mirror=False, network=args.network),
+                                    crop_size=input_size, scale=False, mirror=False, network=args.network),
                                     batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
     data_list = []
@@ -348,8 +345,8 @@ def main():
                                 args.method, scale=float(args.whole_scale))
 
         seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
-        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, 255))
-        ma.set_fill_value(m_seg_pred, 20)
+        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, 26)) # dataset specific
+        ma.set_fill_value(m_seg_pred, 26) # dataset specific
         seg_pred = m_seg_pred
 
         for i in range(image.size(0)): 
@@ -358,11 +355,13 @@ def main():
             sys.stdout.flush()
             if args.store_output == 'True':
                 output_im = PILImage.fromarray(seg_pred[i])
-                output_im.putpalette(palette)
-                output_im.save(output_path+'/'+name[i]+'.png')
-                mlflow.log_artifact(output_path+'/'+name[i]+'.png')
+                dir_name, img_name = os.path.split(name[i])
+                if not os.path.exists(output_path+dir_name):
+                    os.makedirs(output_path+dir_name)
+                output_im.save(output_path+dir_name+img_name)
+                mlflow.log_artifact(output_path+dir_name+img_name)
         seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
-        ignore_index = seg_gt != 255
+        ignore_index = seg_gt != 26 # dataset specific
         seg_gt = seg_gt[ignore_index]
         seg_pred = seg_pred[ignore_index]
         confusion_matrix += get_confusion_matrix(seg_gt, seg_pred, args.num_classes)
