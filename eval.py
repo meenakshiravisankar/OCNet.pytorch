@@ -358,8 +358,8 @@ def main():
                 dir_name, img_name = os.path.split(name[i])
                 if not os.path.exists(output_path+dir_name):
                     os.makedirs(output_path+dir_name)
-                output_im.save(output_path+dir_name+img_name)
-                mlflow.log_artifact(output_path+dir_name+img_name)
+                output_im.save(output_path+dir_name+'/'+img_name)
+                mlflow.log_artifact(output_path+dir_name+'/'+img_name)
         seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
         ignore_index = seg_gt != 26 # dataset specific
         seg_gt = seg_gt[ignore_index]
