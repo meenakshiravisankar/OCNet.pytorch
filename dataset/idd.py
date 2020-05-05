@@ -50,7 +50,7 @@ class IddSegmentationTrain(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {-1 : ignore_label}
+        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
         for i in range(26):
             (self.id_to_trainid)[i] = i
 

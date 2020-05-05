@@ -15,8 +15,8 @@ WEIGHT_DECAY=5e-4
 START_ITERS=0
 MAX_ITERS=40000
 BATCHSIZE=8
-INPUT_SIZE='769,769'
-USE_CLASS_BALANCE=True
+INPUT_SIZE='720,1280'
+USE_CLASS_BALANCE=False
 USE_OHEM=False
 OHEMTHRES=0.7
 OHEMKEEP=0
@@ -39,11 +39,11 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 # testing settings
 TEST_USE_FLIP=False
 TEST_USE_MS=False
-TEST_STORE_RESULT=False
-TEST_BATCHSIZE=8
+TEST_STORE_RESULT=True
+TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/1/c11e3f62aad84029acd64d39dc233b9b/artifacts/CS_scenes_40000.pth"
+TEST_RESTORE_FROM="mlruns/6/6b0a1c5abfdb4982a272f84ddf333245/artifacts/CS_scenes_40000.pth"
 
 ########################################################################################################################
 #  Testing
