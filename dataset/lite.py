@@ -1,14 +1,3 @@
-##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-## Created by: speedinghzl02
-## Modified by: RainbowSecret
-## Microsoft Research
-## yuyua@microsoft.com
-## Copyright (c) 2018
-##
-## This source code is licensed under the MIT-style license found in the
-## LICENSE file in the root directory of this source tree 
-##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 import cv2
 import pdb
 import collections
@@ -24,9 +13,9 @@ from torch.utils import data
 import torchvision.transforms as transforms
 
 
-class IddSegmentationTrain(data.Dataset):
+class LiteSegmentationTrain(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=26, use_aug=False, network="renset101"):
+        scale=True, mirror=True, ignore_label=255, use_aug=False, network="renset101"):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -50,9 +39,10 @@ class IddSegmentationTrain(data.Dataset):
                 "name": label_path,
                 "weight": 1
             })
-        self.id_to_trainid = {-1 : 26, 255 : 26}
-        for i in range(26):
-            (self.id_to_trainid)[i] = i
+        self.id_to_trainid = {-1: ignore_label, 255: ignore_label}
+        for i in range(7):
+            (self.id_to_trainid)[i]=i
+
 
         print('{} images are loaded!'.format(len(self.img_ids)))
 
@@ -137,9 +127,9 @@ class IddSegmentationTrain(data.Dataset):
         return image.copy(), label.copy(), np.array(size), name
 
 
-class IddSegmentationTest(data.Dataset):
+class LiteSegmentationTest(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=26, network=None):
+        scale=True, mirror=True, ignore_label=255, network=None):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -159,9 +149,12 @@ class IddSegmentationTest(data.Dataset):
                 "img": img_file,
                 "name": name
             })
-        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
-        for i in range(26):
-            (self.id_to_trainid)[i] = i
+        self.id_to_trainid = {-1: ignore_label, 0: ignore_label, 1: ignore_label, 2: ignore_label,
+                              3: ignore_label, 4: ignore_label, 5: ignore_label, 6: ignore_label,
+                              7: 0, 8: 1, 9: ignore_label, 10: ignore_label, 11: 2, 12: 3, 13: 4,
+                              14: ignore_label, 15: ignore_label, 16: ignore_label, 17: 5,
+                              18: ignore_label, 19: 6, 20: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14,
+                              28: 15, 29: ignore_label, 30: ignore_label, 31: 16, 32: 17, 33: 18}
 
         print('{} images are loaded!'.format(len(self.img_ids)))
 
@@ -223,9 +216,9 @@ class IddSegmentationTest(data.Dataset):
         return image.copy(), np.array(size), name
 
 
-class IddSegmentationTrainWpath(data.Dataset):
+class LiteSegmentationTrainWpath(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=26, use_aug=False, network=None):
+        scale=True, mirror=True, ignore_label=255, use_aug=False, network=None):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -249,9 +242,12 @@ class IddSegmentationTrainWpath(data.Dataset):
                 "name": name,
                 "weight": 1
             })
-        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
-        for i in range(26):
-            (self.id_to_trainid)[i] = i
+        self.id_to_trainid = {-1: ignore_label, 0: ignore_label, 1: ignore_label, 2: ignore_label,
+                              3: ignore_label, 4: ignore_label, 5: ignore_label, 6: ignore_label,
+                              7: 0, 8: 1, 9: ignore_label, 10: ignore_label, 11: 2, 12: 3, 13: 4,
+                              14: ignore_label, 15: ignore_label, 16: ignore_label, 17: 5,
+                              18: ignore_label, 19: 6, 20: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14,
+                              28: 15, 29: ignore_label, 30: ignore_label, 31: 16, 32: 17, 33: 18}
         print('{} images are loaded!'.format(len(self.img_ids)))
 
     def __len__(self):
@@ -338,11 +334,10 @@ class IddSegmentationTrainWpath(data.Dataset):
 
 
 if __name__ == '__main__':
-    # yet to change
-    dst = IddSegmentationTrain("./idd/", "./list/idd/1/train.lst", crop_size=(1024, 2048))
+    dst = CitySegmentationTrain("./cityscapes/", "./list/cityscapes/trainval.lst", crop_size=(1024, 2048))
     trainloader = data.DataLoader(dst, batch_size=1, num_workers=0)
 
-    with open("./list/idd/1/train.lst") as f:
+    with open("./list/cityscapes/trainval.lst") as f:
         train_list = f.readlines()
     train_list = [x.strip() for x in train_list] 
 
