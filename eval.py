@@ -345,8 +345,8 @@ def main():
                                 args.method, scale=float(args.whole_scale))
 
         seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
-        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, 26)) # dataset specific
-        ma.set_fill_value(m_seg_pred, 26) # dataset specific
+        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, ignore_label)) # dataset specific
+        ma.set_fill_value(m_seg_pred, ignore_label) # dataset specific
         seg_pred = m_seg_pred
 
         for i in range(image.size(0)): 
@@ -361,7 +361,7 @@ def main():
                 output_im.save(output_path+dir_name+'/'+img_name)
                 mlflow.log_artifact(output_path+dir_name+'/'+img_name)
         seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
-        ignore_index = seg_gt != 26 # dataset specific
+        ignore_index = seg_gt != ignore_label # dataset specific
         seg_gt = seg_gt[ignore_index]
         seg_pred = seg_pred[ignore_index]
         confusion_matrix += get_confusion_matrix(seg_gt, seg_pred, args.num_classes)

@@ -27,7 +27,7 @@ class Parameters():
                             help="Path to the directory containing dataset.")
         parser.add_argument("--data-list", type=str, default='./dataset/list/cityscapes/train.lst',
                             help="Path to the file listing the images in the dataset.")
-        parser.add_argument("--ignore-label", type=int, default=26,
+        parser.add_argument("--ignore-label", type=int, default=255,
                             help="The index of the label to ignore during the training.")
         parser.add_argument("--input-size", type=str, default='769,769',
                             help="Comma-separated string with height and width of images.")
@@ -39,7 +39,7 @@ class Parameters():
                             help="Momentum component of the optimiser.")
         parser.add_argument("--not-restore-last", action="store_true",
                             help="Whether to not restore last (FC) layers.")
-        parser.add_argument("--num-classes", type=int, default=19,
+        parser.add_argument("--num-classes", type=int, default=7,
                             help="Number of classes to predict (including background).")
         parser.add_argument("--start-iters", type=int, default=0,
                             help="Number of classes to predict (including background).")
