@@ -138,7 +138,7 @@ def main():
 
 
     optimizer.zero_grad()
-
+    loss_avg = 0
     for i_iter, batch in enumerate(trainloader):
         sys.stdout.flush()
         i_iter += args.start_iters
@@ -149,7 +149,7 @@ def main():
         lr = adjust_learning_rate(optimizer, i_iter)
         if args.fix_lr:
             lr = args.learning_rate
-        print('learning_rate: {}'.format(lr))
+#        print('learning_rate: {}'.format(lr))
 
         if 'gt' in args.method:
             preds = model(images, labels)
@@ -162,7 +162,10 @@ def main():
         if i_iter % 100 == 0:
             writer.add_scalar('learning_rate', lr, i_iter)
             writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
-        print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss.data.cpu().numpy()))
+        loss_avg = loss_avg+loss.data.cpu().numpy()
+        if i_iter % 10 == 0 and i_iter:
+            print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss_avg/10))
+            loss_avg = 0
         # mlflow logging
         mlflow.log_metric(key="loss", value=float(loss.data.cpu().numpy()), step=int(i_iter))
         mlflow.log_metric(key="learning_rate", value=lr, step=int(i_iter))
