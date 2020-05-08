@@ -29,7 +29,7 @@ EXPERIMENT_NAME="$1"
 
 # replace the DATA_DIR with your folder path to the dataset.
 DATA_DIR='./dataset/idd'
-DATA_LIST_PATH='./dataset/list/idd/train.lst'
+DATA_LIST_PATH='./dataset/list/idd/train_1.lst'
 RESTORE_FROM='./pretrained_model/resnet101-imagenet.pth'
 
 # Set the Output path of checkpoints, training log.
@@ -39,11 +39,11 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 # testing settings
 TEST_USE_FLIP=False
 TEST_USE_MS=False
-TEST_STORE_RESULT=True
+TEST_STORE_RESULT=False
 TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/6/6b0a1c5abfdb4982a272f84ddf333245/artifacts/CS_scenes_40000.pth"
+TEST_RESTORE_FROM="checkpoint/snapshots_resnet101_interlaced_dsn_1e-2_5e-4_4_40000/CS_scenes_40000.pth"
 
 ########################################################################################################################
 #  Testing
@@ -53,7 +53,7 @@ mkdir -p visualize
 # validation set
 TESTDATASET="idd_train"
 TEST_SET="val"
-TEST_DATA_LIST_PATH="./dataset/list/idd/val.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/val_1.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
@@ -66,7 +66,7 @@ fi
 # training set
 TESTDATASET="idd_train"
 TEST_SET="train"
-TEST_DATA_LIST_PATH="./dataset/list/idd/train.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/train_1.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
@@ -80,7 +80,7 @@ fi
 TEST_STORE_RESULT=True
 TESTDATASET="idd_test"
 TEST_SET="test"
-TEST_DATA_LIST_PATH="./dataset/list/idd/test.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/test_1.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
