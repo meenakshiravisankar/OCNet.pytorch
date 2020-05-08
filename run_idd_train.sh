@@ -13,12 +13,12 @@ NUM_CLASSES=26
 #training settings
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
-START_ITERS=0
-MAX_ITERS=100000
+START_ITERS=16000
+MAX_ITERS=40000
 BATCHSIZE=4
 INPUT_SIZE='769,769'
 USE_CLASS_BALANCE=True
-USE_OHEM=True
+USE_OHEM=False
 OHEMTHRES=0.7
 OHEMKEEP=0
 USE_VAL_SET=False
@@ -30,7 +30,7 @@ EXPERIMENT_NAME="$1"
 # replace the DATA_DIR with your folder path to the dataset.
 DATA_DIR='./dataset/idd'
 DATA_LIST_PATH='./dataset/list/idd/train_1.lst'
-RESTORE_FROM='./pretrained_model/resnet101-imagenet.pth'
+RESTORE_FROM='checkpoint/snapshots_resnet101_base_oc_dsn_5e-3_5e-4_4_40000/CS_scenes_16000.pth'
 
 # Set the Output path of checkpoints, training log.
 TRAIN_LOG_DIR="./log/log_train"

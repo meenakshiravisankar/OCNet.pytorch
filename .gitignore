@@ -10,3 +10,4 @@ pretrained_model/
 *.ipynb
 mlruns/
 prof*
+backup*
