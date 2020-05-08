@@ -14,7 +14,7 @@ class CrossEntropy2d(nn.Module):
         self.ignore_label = ignore_label
         self.use_weight   = use_weight
         if self.use_weight:
-            self.weight = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 1.0166, 0.9969, 0.9754, 1.0489, 0.8786, 1.0023, 0.9539, 0.9843, 1.1116, 0.9037, 1.0865, 1.0955, 1.0865, 1.1529, 1.0507]).cuda()
+            self.weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
             print('CrossEntropy2d weights : {}'.format(self.weight))
         else:
             self.weight = None
@@ -73,7 +73,7 @@ class OhemCrossEntropy2d(nn.Module):
         self.min_kept = int(min_kept)
         if use_weight:
             print("w/ class balance")
-            weight = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 1.0166, 0.9969, 0.9754, 1.0489, 0.8786, 1.0023, 0.9539, 0.9843, 1.1116, 0.9037, 1.0865, 1.0955, 1.0865, 1.1529, 1.0507])
+            weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
             self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_label)
         else:
             print("w/o class balance")

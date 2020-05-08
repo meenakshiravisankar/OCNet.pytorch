@@ -39,7 +39,7 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 # testing settings
 TEST_USE_FLIP=False
 TEST_USE_MS=False
-TEST_STORE_RESULT=False
+TEST_STORE_RESULT=True
 TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
@@ -53,7 +53,7 @@ mkdir -p visualize
 # validation set
 TESTDATASET="idd_train"
 TEST_SET="val"
-TEST_DATA_LIST_PATH="./dataset/list/idd/val_1.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/inference.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 

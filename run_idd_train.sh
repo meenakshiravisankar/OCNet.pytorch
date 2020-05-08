@@ -6,19 +6,19 @@ PYTHON="python3"
 
 #network config
 NETWORK="resnet101"
-METHOD="interlaced_dsn"
+METHOD="base_oc_dsn"
 DATASET="idd_train"
 NUM_CLASSES=26
 
 #training settings
-LEARNING_RATE=1e-2
+LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=40000
+MAX_ITERS=100000
 BATCHSIZE=4
 INPUT_SIZE='769,769'
 USE_CLASS_BALANCE=True
-USE_OHEM=False
+USE_OHEM=True
 OHEMTHRES=0.7
 OHEMKEEP=0
 USE_VAL_SET=False
@@ -29,7 +29,7 @@ EXPERIMENT_NAME="$1"
 
 # replace the DATA_DIR with your folder path to the dataset.
 DATA_DIR='./dataset/idd'
-DATA_LIST_PATH='./dataset/list/idd/train.lst'
+DATA_LIST_PATH='./dataset/list/idd/train_1.lst'
 RESTORE_FROM='./pretrained_model/resnet101-imagenet.pth'
 
 # Set the Output path of checkpoints, training log.

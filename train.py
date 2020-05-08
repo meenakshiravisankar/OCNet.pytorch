@@ -163,8 +163,8 @@ def main():
             writer.add_scalar('learning_rate', lr, i_iter)
             writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
         loss_avg = loss_avg+loss.data.cpu().numpy()
-        if i_iter % 10 == 0 and i_iter:
-            print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss_avg/10))
+        if i_iter % 20 == 0 and i_iter:
+            print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss_avg/20))
             loss_avg = 0
         # mlflow logging
         mlflow.log_metric(key="loss", value=float(loss.data.cpu().numpy()), step=int(i_iter))
