@@ -303,10 +303,16 @@ def main():
 
     data_list = []
     confusion_matrix = np.zeros((args.num_classes,args.num_classes))
+    # confusion_matrix = np.eye((args.num_classes))
+    
     # level 2
     confusion_matrix_2 = np.zeros((16, 16))
+    # confusion_matrix_2 = np.eye((16))
+    
     # level 1
     confusion_matrix_1 = np.zeros((7, 7))
+    # confusion_matrix_1 = np.eye((7))
+    
     
     Label = namedtuple( 'Label' , [
 
@@ -458,10 +464,23 @@ def main():
         seg_pred_2 = seg_pred_2[ignore_index]
         seg_pred_1 = seg_pred_1[ignore_index]
         
-        print(seg_pred.shape)
+        # level 2 gt
+        seg_gt_2 = np.array(seg_gt)
+        for class_label in labels:
+            label_id_src = class_label.level3Id
+            label_id_dst = class_label.level2Id
+            seg_gt_2[seg_gt_2==label_id_src] = label_id_dst
+        
+        # level 1 gt
+        seg_gt_1 = np.array(seg_gt)
+        for class_label in labels:
+            label_id_src = class_label.level3Id
+            label_id_dst = class_label.level1Id
+            seg_gt_1[seg_gt_1==label_id_src] = label_id_dst
+
         confusion_matrix += get_confusion_matrix(seg_gt, seg_pred, args.num_classes)
-        confusion_matrix_2 += get_confusion_matrix(seg_gt, seg_pred_2, 16)
-        confusion_matrix_1 += get_confusion_matrix(seg_gt, seg_pred_1, 7)
+        confusion_matrix_2 += get_confusion_matrix(seg_gt_2, seg_pred_2, 16)
+        confusion_matrix_1 += get_confusion_matrix(seg_gt_1, seg_pred_1, 7)
     # level 3
     pos = confusion_matrix.sum(1)
     res = confusion_matrix.sum(0)
