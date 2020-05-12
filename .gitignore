@@ -11,3 +11,4 @@ pretrained_model/
 mlruns/
 prof*
 backup*
+dataset/idd
