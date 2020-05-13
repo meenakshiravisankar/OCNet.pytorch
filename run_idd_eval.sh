@@ -10,26 +10,26 @@ METHOD="interlaced_dsn"
 DATASET="idd_train"
 
 #training settings
-LEARNING_RATE=1e-2
+LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
 MAX_ITERS=40000
 BATCHSIZE=4
-INPUT_SIZE='720,1280'
+INPUT_SIZE='769,769'
 USE_CLASS_BALANCE=True
 USE_OHEM=False
 OHEMTHRES=0.7
 OHEMKEEP=0
 USE_VAL_SET=False
 USE_EXTRA_SET=False
-NUM_CLASSES=26
+NUM_CLASSES=7
 
 #mlflow config
 EXPERIMENT_NAME="$1"
 
 # replace the DATA_DIR with your folder path to the dataset.
 DATA_DIR='./dataset/idd'
-DATA_LIST_PATH='./dataset/list/idd/train_1.lst'
+DATA_LIST_PATH='./dataset/list/idd/train_l1.lst'
 RESTORE_FROM='./pretrained_model/resnet101-imagenet.pth'
 
 # Set the Output path of checkpoints, training log.
@@ -43,7 +43,7 @@ TEST_STORE_RESULT=True
 TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="checkpoint/snapshots_resnet101_interlaced_dsn_1e-2_5e-4_4_40000/CS_scenes_40000.pth"
+TEST_RESTORE_FROM="mlruns/3/train_52_80/artifacts/CS_scenes_80000.pth"
 
 ########################################################################################################################
 #  Testing
@@ -53,12 +53,12 @@ mkdir -p visualize
 # validation set
 TESTDATASET="idd_train"
 TEST_SET="val"
-TEST_DATA_LIST_PATH="./dataset/list/idd/inference.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/val_l1.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
 if [ "$2" == "val" ]; then
-    $PYTHON -u eval.py --data-dir $DATA_DIR --num-classes $NUM_CLASSES --experiment-name $EXPERIMENT_NAME --network=$NETWORK --method=$METHOD --batch-size=$TEST_BATCHSIZE --data-list $TEST_DATA_LIST_PATH --dataset $TESTDATASET \
+    $PYTHON -u eval_1.py --data-dir $DATA_DIR --num-classes $NUM_CLASSES --experiment-name $EXPERIMENT_NAME --network=$NETWORK --method=$METHOD --batch-size=$TEST_BATCHSIZE --data-list $TEST_DATA_LIST_PATH --dataset $TESTDATASET \
     --restore-from=$TEST_RESTORE_FROM  --store-output=$TEST_STORE_RESULT --output-path=$TEST_OUTPUT_PATH --input-size $INPUT_SIZE \
     --use-flip=$TEST_USE_FLIP  --use-ms=$TEST_USE_MS --gpu 0,1,2,3 --predict-choice $PREDICT_CHOICE --whole-scale ${WHOLE_SCALE} > $TEST_LOG_FILE 2>&1
 fi
