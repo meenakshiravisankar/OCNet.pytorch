@@ -27,7 +27,7 @@ class Parameters():
                             help="Path to the directory containing dataset.")
         parser.add_argument("--data-list", type=str, default='./dataset/list/cityscapes/train.lst',
                             help="Path to the file listing the images in the dataset.")
-        parser.add_argument("--ignore-label", type=int, default=26,
+        parser.add_argument("--ignore-label", type=int, default=7,
                             help="The index of the label to ignore during the training.")
         parser.add_argument("--input-size", type=str, default='769,769',
                             help="Comma-separated string with height and width of images.")
