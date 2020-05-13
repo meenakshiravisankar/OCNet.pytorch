@@ -298,21 +298,11 @@ def main():
 
 
     testloader = data.DataLoader(get_segmentation_dataset(args.dataset, root=args.data_dir, list_path=args.data_list, 
-                                    crop_size=input_size, scale=False, mirror=False, network=args.network),
+                                    crop_size=input_size, scale=False, mirror=False, ignore_label=args.ignore_label, network=args.network),
                                     batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
     data_list = []
-    confusion_matrix = np.zeros((args.num_classes,args.num_classes))
-    # confusion_matrix = np.eye((args.num_classes))
-    
-    # level 2
-    confusion_matrix_2 = np.zeros((16, 16))
-    # confusion_matrix_2 = np.eye((16))
-    
-    # level 1
-    confusion_matrix_1 = np.zeros((7, 7))
-    # confusion_matrix_1 = np.eye((7))
-    
+    confusion_matrix = np.zeros((args.num_classes,args.num_classes))    
     
     Label = namedtuple( 'Label' , [
 
@@ -418,33 +408,11 @@ def main():
                         else:
                             output = predict_whole_img(model, image.numpy(), args.num_classes, 
                                 args.method, scale=float(args.whole_scale))
-        # level 3 predictions
-        seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
-        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, 26)) # dataset specific
-        ma.set_fill_value(m_seg_pred, 26) # dataset specific
-        seg_pred = m_seg_pred
-
-        # level 2 predictions
-        seg_pred_2 = np.array(seg_pred)
-        for class_label in labels:
-            label_id_src = class_label.level3Id
-            label_id_dst = class_label.level2Id
-            seg_pred_2[seg_pred_2==label_id_src] = label_id_dst
-        
-        m_seg_pred_2 = ma.masked_array(seg_pred_2, mask=torch.eq(label, 26)) # dataset specific
-        ma.set_fill_value(m_seg_pred_2, 26) # dataset specific
-        seg_pred_2 = m_seg_pred_2
-
         # level 1 predictions
-        seg_pred_1 = np.array(seg_pred)
-        for class_label in labels:
-            label_id_src = class_label.level3Id
-            label_id_dst = class_label.level1Id
-            seg_pred_1[seg_pred_1==label_id_src] = label_id_dst
-        
-        m_seg_pred_1 = ma.masked_array(seg_pred_1, mask=torch.eq(label, 26)) # dataset specific
-        ma.set_fill_value(m_seg_pred_1, 26) # dataset specific
-        seg_pred_1 = m_seg_pred_1
+        seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
+        m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, ignore_label)) # dataset specific
+        ma.set_fill_value(m_seg_pred, ignore_label) # dataset specific
+        seg_pred = m_seg_pred
 
         for i in range(image.size(0)): 
             image_id += 1
@@ -458,29 +426,12 @@ def main():
                 output_im.save(output_path+dir_name+'/'+img_name)
                 mlflow.log_artifact(output_path+dir_name+'/'+img_name)
         seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
-        ignore_index = seg_gt != 26 # dataset specific
+        ignore_index = seg_gt != ignore_label # dataset specific
         seg_gt = seg_gt[ignore_index]
         seg_pred = seg_pred[ignore_index]
-        seg_pred_2 = seg_pred_2[ignore_index]
-        seg_pred_1 = seg_pred_1[ignore_index]
         
-        # level 2 gt
-        seg_gt_2 = np.array(seg_gt)
-        for class_label in labels:
-            label_id_src = class_label.level3Id
-            label_id_dst = class_label.level2Id
-            seg_gt_2[seg_gt_2==label_id_src] = label_id_dst
-        
-        # level 1 gt
-        seg_gt_1 = np.array(seg_gt)
-        for class_label in labels:
-            label_id_src = class_label.level3Id
-            label_id_dst = class_label.level1Id
-            seg_gt_1[seg_gt_1==label_id_src] = label_id_dst
-
         confusion_matrix += get_confusion_matrix(seg_gt, seg_pred, args.num_classes)
-        confusion_matrix_2 += get_confusion_matrix(seg_gt_2, seg_pred_2, 16)
-        confusion_matrix_1 += get_confusion_matrix(seg_gt_1, seg_pred_1, 7)
+    
     # level 3
     pos = confusion_matrix.sum(1)
     res = confusion_matrix.sum(0)
@@ -496,45 +447,6 @@ def main():
     mlflow.log_param("mean_iu", mean_IU)
     mlflow.log_param("iu_array", IU_array)
     mlflow.log_param("confusion_matrix", confusion_matrix)
-
-    # level 2
-    pos = confusion_matrix_2.sum(1)
-    res = confusion_matrix_2.sum(0)
-    tp = np.diag(confusion_matrix_2)
-
-    IU_array_2 = (tp / np.maximum(1.0, pos + res - tp))
-    mean_IU_2 = IU_array_2.mean()
-    
-    print({'meanIU':mean_IU_2, 'IU_array_2':IU_array_2})
-
-    print("confusion matrix\n")
-    print(confusion_matrix_2)
-    mlflow.log_param("mean_iu_2", mean_IU_2)
-    mlflow.log_param("iu_array_2", IU_array_2)
-    mlflow.log_param("confusion_matrix_2", confusion_matrix_2)
-
-    # level 1
-    pos = confusion_matrix_1.sum(1)
-    res = confusion_matrix_1.sum(0)
-    tp = np.diag(confusion_matrix_1)
-
-    IU_array_1 = (tp / np.maximum(1.0, pos + res - tp))
-    mean_IU_1 = IU_array_1.mean()
-    
-    print({'meanIU':mean_IU_1, 'IU_array_1':IU_array_1})
-
-    print("confusion matrix\n")
-    print(confusion_matrix_1)
-    print("#######")
-    print("Summary")
-    print("#######")
-    print("Level 3 mIOU = ", mean_IU)
-    print("Level 2 mIOU = ", mean_IU_2)
-    print("Level 1 mIOU = ", mean_IU_1)
-    
-    mlflow.log_param("mean_iu_1", mean_IU_1)
-    mlflow.log_param("iu_array_1", IU_array_1)
-    mlflow.log_param("confusion_matrix_1", confusion_matrix_1)
     sys.stdout.flush()
 
 if __name__ == '__main__':

@@ -17,10 +17,10 @@ import scipy.ndimage as nd
 torch_ver = torch.__version__[:3]
 
 class CriterionCrossEntropy(nn.Module):
-    def __init__(self, ignore_index=26):
+    def __init__(self, ignore_index=7):
         super(CriterionCrossEntropy, self).__init__()
         self.ignore_index = ignore_index
-        weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
+        weight = torch.FloatTensor([0.939, 1.066, 1.098, 0.994, 0.985, 0.946, 0.972])
         self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_index)
 
     def forward(self, preds, target):
@@ -37,11 +37,11 @@ class CriterionDSN(nn.Module):
     '''
     DSN : We need to consider two supervision for the model.
     '''
-    def __init__(self, ignore_index=26, use_weight=True, dsn_weight=0.4):
+    def __init__(self, ignore_index=7, use_weight=True, dsn_weight=0.4):
         super(CriterionDSN, self).__init__()
         self.ignore_index = ignore_index
         self.dsn_weight = dsn_weight
-        weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
+        weight = torch.FloatTensor([0.939, 1.066, 1.098, 0.994, 0.985, 0.946, 0.972])
         if use_weight:
             print("w/ class balance")
             self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_index)
@@ -70,7 +70,7 @@ class CriterionOhemDSN(nn.Module):
     '''
     DSN + OHEM : We need to consider two supervision for the model.
     '''
-    def __init__(self, ignore_index=26, thres=0.7, min_kept=100000, dsn_weight=0.4, use_weight=True):
+    def __init__(self, ignore_index=7, thres=0.7, min_kept=100000, dsn_weight=0.4, use_weight=True):
         super(CriterionOhemDSN, self).__init__()
         self.ignore_index = ignore_index
         self.dsn_weight = dsn_weight
@@ -97,11 +97,11 @@ class CriterionOhemDSN_single(nn.Module):
                 Thus we choose the original loss for the shallow supervision
                 and the hard-mining loss for the deeper supervision
     '''
-    def __init__(self, ignore_index=26, thres=0.7, min_kept=100000, dsn_weight=0.4):
+    def __init__(self, ignore_index=7, thres=0.7, min_kept=100000, dsn_weight=0.4):
         super(CriterionOhemDSN_single, self).__init__()
         self.ignore_index = ignore_index
         self.dsn_weight = dsn_weight
-        weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
+        weight = torch.FloatTensor([0.939, 1.066, 1.098, 0.994, 0.985, 0.946, 0.972])
         self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_index)
         self.criterion_ohem = OhemCrossEntropy2d(ignore_index, thres, min_kept, use_weight=True)
 

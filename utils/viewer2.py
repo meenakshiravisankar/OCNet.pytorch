@@ -102,6 +102,6 @@ def get_image(label_mask, level):
 def view_image(image):
     h, w = np.array(image).shape
     canvas = PIL.Image.new('RGB', (w, h), 'white')
-    image = get_image(np.array(image),0)
+    image = get_image(np.array(image),2)
     canvas.paste(PIL.Image.fromarray(image, 'RGB'), ((0,0)))
     return canvas

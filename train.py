@@ -130,7 +130,7 @@ def main():
 
     trainloader = data.DataLoader(get_segmentation_dataset(args.dataset, root=args.data_dir, list_path=args.data_list,
                     max_iters=args.num_steps*args.batch_size, crop_size=input_size, 
-                    scale=args.random_scale, mirror=args.random_mirror, network=args.network), 
+                    scale=args.random_scale, mirror=args.random_mirror, ignore_label=args.ignore_label, network=args.network), 
                     batch_size=args.batch_size, shuffle=True, num_workers=1, pin_memory=True)
 
     optimizer = optim.SGD([{'params': filter(lambda p: p.requires_grad, deeplab.parameters()), 'lr': args.learning_rate }], 

@@ -26,7 +26,7 @@ import torchvision.transforms as transforms
 
 class IddSegmentationTrain(data.Dataset):
     def __init__(self, root, list_path, max_iters=None, crop_size=(321, 321),
-        scale=True, mirror=True, ignore_label=26, use_aug=False, network="renset101"):
+        scale=True, mirror=True, ignore_label=7, use_aug=False, network="renset101"):
         self.root = root
         self.list_path = list_path
         self.crop_h, self.crop_w = crop_size
@@ -50,8 +50,8 @@ class IddSegmentationTrain(data.Dataset):
                 "name": label_path,
                 "weight": 1
             })
-        self.id_to_trainid = {-1 : ignore_label, 255 : 26}
-        for i in range(26):
+        self.id_to_trainid = {-1 : ignore_label, 255 : ignore_label}
+        for i in range(7):
             (self.id_to_trainid)[i] = i
 
         print('{} images are loaded!'.format(len(self.img_ids)))
