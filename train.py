@@ -76,7 +76,7 @@ def main():
     new_params = deeplab.state_dict().copy()
 
     if args.finetune:
-        # remove classifier and dsn layers
+        # remove classifier and dsn params
         for i in saved_state_dict:
             i_parts = i.split('.')
             if not i_parts[0]=='cls' and not  i_parts[0]=='dsn':
@@ -110,7 +110,7 @@ def main():
         deeplab.load_state_dict(new_params)
     
     if args.finetune:
-        # no grad for 15 layers and last two layers
+        # no grad for 15 layers
         for idx, param in enumerate(deeplab.parameters()):
             if idx < 15:
                 param.requires_grad=False
