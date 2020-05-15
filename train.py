@@ -75,32 +75,45 @@ def main():
     saved_state_dict = torch.load(args.restore_from)
     new_params = deeplab.state_dict().copy()
 
-    if 'wide' in args.network:
-        saved_state_dict = saved_state_dict['state_dict']
-        if 'vistas' in args.method:
-            saved_state_dict = saved_state_dict['body']
-            for i in saved_state_dict:
-                new_params[i] = saved_state_dict[i]
-        else:     
-            for i in saved_state_dict:
-                i_parts = i.split('.')
-                if not 'classifier' in i_parts: 
-                    new_params['.'.join(i_parts[1:])] = saved_state_dict[i]
-    elif 'mobilenet' in args.network:
+    if args.finetune:
+        # remove classifier and dsn params
         for i in saved_state_dict:
             i_parts = i.split('.')
-            if not (i_parts[0]=='features' and i_parts[1]=='18') and not i_parts[0]=='classifier':
+            if not i_parts[0]=='cls' and not  i_parts[0]=='dsn':
                 new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
     else:
-        for i in saved_state_dict:
-            i_parts = i.split('.')
-            if not i_parts[0]=='fc' and not  i_parts[0]=='last_linear' and not  i_parts[0]=='classifier':
-                new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
+        if 'wide' in args.network:
+            saved_state_dict = saved_state_dict['state_dict']
+            if 'vistas' in args.method:
+                saved_state_dict = saved_state_dict['body']
+                for i in saved_state_dict:
+                    new_params[i] = saved_state_dict[i]
+            else:     
+                for i in saved_state_dict:
+                    i_parts = i.split('.')
+                    if not 'classifier' in i_parts: 
+                        new_params['.'.join(i_parts[1:])] = saved_state_dict[i]
+        elif 'mobilenet' in args.network:
+            for i in saved_state_dict:
+                i_parts = i.split('.')
+                if not (i_parts[0]=='features' and i_parts[1]=='18') and not i_parts[0]=='classifier':
+                    new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
+        else:
+            for i in saved_state_dict:
+                i_parts = i.split('.')
+                if not i_parts[0]=='fc' and not  i_parts[0]=='last_linear' and not  i_parts[0]=='classifier':
+                    new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
 
     if args.start_iters > 0:
         deeplab.load_state_dict(saved_state_dict)
     else:
         deeplab.load_state_dict(new_params)
+    
+    if args.finetune:
+        # no grad for 15 layers
+        for idx, param in enumerate(deeplab.parameters()):
+            if idx < 15:
+                param.requires_grad=False
 
     model = DataParallelModel(deeplab)
     # model = nn.DataParallel(deeplab)

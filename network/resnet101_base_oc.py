@@ -108,7 +108,27 @@ class ResNet(nn.Module):
         x = self.cls(x)
         return [x_dsn, x]
 
+class SA(nn.Module):
+    def __init__(self):
+        super(SA, self).__init__()
+        # extra added layers
+        self.context = nn.Sequential(
+            nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1),
+            InPlaceABNSync(512),
+            BaseOC_Module(in_channels=512, out_channels=512, key_channels=256, value_channels=256, 
+            dropout=0.05, sizes=([1]))
+            )
+        self.cls = nn.Conv2d(512, 26, kernel_size=1, stride=1, padding=0, bias=True)
+        
+    def forward(self, x):
+        x = self.context(x)
+        x = self.cls(x)
+        return x
 
 def get_resnet101_base_oc_dsn(num_classes=21):
     model = ResNet(Bottleneck,[3, 4, 23, 3], num_classes)
+    return model
+
+def get_resnet101_base_oc_dsn_inf(num_classes=21):
+    model = SA()
     return model

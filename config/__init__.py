@@ -97,6 +97,8 @@ class Parameters():
         parser.add_argument("--pair-weight", type=float, default=1,
                             help="choose the weight of the pair-wise loss supervision.")
         parser.add_argument('--seed', default=304, type=int, help='manual seed')
+        parser.add_argument("--finetune", action="store_true",
+                            help="Whether to finetune.")
 
         parser.add_argument("--output-path", type=str, default='./seg_output_eval_set',
                         help="Path to the segmentation map prediction.")

@@ -107,7 +107,27 @@ class ResNet(nn.Module):
         x = self.cls(x)
         return [x_dsn, x]
 
+class ISA(nn.Module):
+    def __init__(self):
+        super(ISA, self).__init__()
+        # extra added layers
+        self.context = nn.Sequential(
+            nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1, bias=False),
+            InPlaceABNSync(512),
+            ISA_Module(in_channels=512, key_channels=256, value_channels=512,
+                       out_channels=512, down_factors=[[8,8]], dropout=0.05),
+            )
+        self.cls = nn.Conv2d(512, 26, kernel_size=1, stride=1, padding=0, bias=True)
+        
+    def forward(self, x):
+        x = self.context(x)
+        x = self.cls(x)
+        return x
 
 def get_resnet101_interlaced_dsn(num_classes=21):
     model = ResNet(Bottleneck,[3, 4, 23, 3], num_classes)
+    return model
+
+def get_resnet101_interlaced_dsn_inf(num_classes=21):
+    model = ISA()
     return model
