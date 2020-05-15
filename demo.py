@@ -39,7 +39,7 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"]="0"    
     saved_state_dict = torch.load("mlruns/3/train_52_80/artifacts/CS_scenes_80000.pth")
     model.load_state_dict(saved_state_dict)
-    computeTime(model, size=(3,720,1080))
+    computeTime(model, size=(3,320,480))
 
 if __name__ == '__main__':
     main()
