@@ -75,12 +75,23 @@ def main():
     saved_state_dict = torch.load(args.restore_from)
     new_params = deeplab.state_dict().copy()
 
-    if args.finetune:
-        # remove classifier and dsn params
-        for i in saved_state_dict:
-            i_parts = i.split('.')
-            if not i_parts[0]=='cls' and not  i_parts[0]=='dsn':
-                new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
+    if args.fine_tune:
+        # set dsn weight to 0
+        args.dsn_weight = 0
+        # no grad before context and for dsn
+        for idx, param in enumerate(deeplab.parameters()):
+            if idx < 318 or idx > 345:
+                param.requires_grad=False
+
+        if args.resume_training:
+            deeplab.load_state_dict(saved_state_dict)
+        else:
+            # remove classifier and dsn params if starting fine-tune
+            for i in saved_state_dict:
+                i_parts = i.split('.')
+                if not i_parts[0]=='cls' and not  i_parts[0]=='dsn':
+                    new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
+            deeplab.load_state_dict(new_params)
     else:
         if 'wide' in args.network:
             saved_state_dict = saved_state_dict['state_dict']
@@ -104,16 +115,11 @@ def main():
                 if not i_parts[0]=='fc' and not  i_parts[0]=='last_linear' and not  i_parts[0]=='classifier':
                     new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
 
-    if args.start_iters > 0:
-        deeplab.load_state_dict(saved_state_dict)
-    else:
-        deeplab.load_state_dict(new_params)
+        if args.start_iters > 0:
+            deeplab.load_state_dict(saved_state_dict)
+        else:
+            deeplab.load_state_dict(new_params)
     
-    if args.finetune:
-        # no grad for 15 layers
-        for idx, param in enumerate(deeplab.parameters()):
-            if idx < 15:
-                param.requires_grad=False
 
     model = DataParallelModel(deeplab)
     # model = nn.DataParallel(deeplab)
