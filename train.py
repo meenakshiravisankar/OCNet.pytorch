@@ -75,7 +75,7 @@ def main():
     saved_state_dict = torch.load(args.restore_from)
     new_params = deeplab.state_dict().copy()
 
-    if args.finetune:
+    if args.fine_tune:
         # no grad before context and for dsn
         for idx, param in enumerate(deeplab.parameters()):
             if idx < 318 or idx > 345:
