@@ -33,7 +33,7 @@ import pdb
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
 import mlflow
-from utils.criterion import CriterionCrossEntropy,  CriterionDSN, CriterionOhemDSN, CriterionOhemDSN_single
+from utils.criterion import CriterionFocalLoss, CriterionCrossEntropy,  CriterionDSN, CriterionOhemDSN, CriterionOhemDSN_single
 from utils.parallel import DataParallelModel, DataParallelCriterion
 
 
@@ -127,7 +127,8 @@ def main():
     model.float()
     model.cuda()    
 
-    criterion = CriterionCrossEntropy()
+    #criterion = CriterionCrossEntropy()
+    
     if "dsn" in args.method:
         if args.ohem:
             if args.ohem_single:
@@ -138,7 +139,7 @@ def main():
         else:
             criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=True)
 
-
+    criterion = CriterionFocalLoss()
     criterion = DataParallelCriterion(criterion)
     criterion.cuda()
     cudnn.benchmark = True
