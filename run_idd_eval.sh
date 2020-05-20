@@ -6,16 +6,16 @@ PYTHON="python3"
 
 #network config
 NETWORK="resnet101"
-METHOD="interlaced_dsn"
+METHOD="baseline"
 DATASET="idd_train"
 
 #training settings
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=40000
+MAX_ITERS=80000
 BATCHSIZE=4
-INPUT_SIZE='769,769'
+INPUT_SIZE='720,1280'
 USE_CLASS_BALANCE=True
 USE_OHEM=False
 OHEMTHRES=0.7
@@ -39,11 +39,11 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 # testing settings
 TEST_USE_FLIP=False
 TEST_USE_MS=False
-TEST_STORE_RESULT=True
+TEST_STORE_RESULT=False
 TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/3/train_52_80/artifacts/CS_scenes_80000.pth"
+TEST_RESTORE_FROM="mlruns/11/train_00_80/artifacts/CS_scenes_80000.pth"
 
 ########################################################################################################################
 #  Testing

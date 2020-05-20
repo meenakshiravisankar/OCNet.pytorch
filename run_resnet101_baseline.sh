@@ -2,6 +2,7 @@
 nvidia-smi
 PYTHON="python3"
 
+
 #network config
 NETWORK="resnet101"
 METHOD="baseline"
