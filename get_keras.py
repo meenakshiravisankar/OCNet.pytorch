@@ -138,54 +138,60 @@ def get_resnet101_baseline(num_classes=21):
 
 ## random.seed(42)
 
-restore_from = "mlruns/10/train_00_80/artifacts/CS_scenes_80000.pth"
-torch_model = get_resnet101_baseline(num_classes=26)
-saved_state_dict = torch.load(restore_from, map_location=torch.device('cpu'))
-torch_model.load_state_dict(saved_state_dict)
-torch_model.eval()
-#torch_model.cuda()
+def check_onnx(x, output, path="temp_320_320.onnx"):
+    # Verify the model
+    ort_session = onnxruntime.InferenceSession(path)
+    def to_numpy(tensor):
+        return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
-batch_size = 1
-channels = 3
-input_height = 320
-input_width = 320
+    # compute ONNX Runtime output prediction
+    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(x)}
+    ort_outs = ort_session.run(None, ort_inputs)
+    # compare ONNX Runtime and PyTorch results
+    np.testing.assert_allclose(to_numpy(output), ort_outs[0], rtol=1e-03, atol=1e-05)
+    print("Exported model has been tested with ONNXRuntime, and the result looks good!")
 
-# Input to the model
-#x = torch.randn(batch_size, channels, input_height, input_width)
-#output = torch_model(x)
-#torch.onnx.export(torch_model, x, "./temp_320_320.onnx", opset_version=11, input_names=["input"], output_names=["output"])
-#print("Onnx exported")
+random.seed(42)
 
-#ort_session = onnxruntime.InferenceSession("temp.onnx")
+statuses = ["onnx", "keras", "tflite", "all"]
+status = "tflite"
 
-#def to_numpy(tensor):
-#    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+if status == statuses[0] or status == statuses[-1]:
+    restore_from = "mlruns/11/train_00_80/artifacts/CS_scenes_80000.pth"
+    torch_model = get_resnet101_baseline(num_classes=7)
+    saved_state_dict = torch.load(restore_from, map_location=torch.device('cpu'))
+    torch_model.load_state_dict(saved_state_dict)
+    torch_model.eval()
 
-# compute ONNX Runtime output prediction
-#ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(x)}
-#ort_outs = ort_session.run(None, ort_inputs)
+    batch_size = 1
+    channels = 3
+    input_height = 320
+    input_width = 320
 
-# compare ONNX Runtime and PyTorch results
-#np.testing.assert_allclose(to_numpy(output), ort_outs[0], rtol=1e-03, atol=1e-05)
+    # Input to the model
+    x = torch.randn(batch_size, channels, input_height, input_width)
+    output = torch_model(x)
+    torch.onnx.export(torch_model, x, "./temp_320_320.onnx", opset_version=11, 
+                      input_names=["input"], output_names=["output"])
+    print("Onnx exported")
+    check_onnx(x, output, "temp_320_320.onnx")
 
-#print("Exported model has been tested with ONNXRuntime, and the result looks good!")
+if status == statuses[1] or status==statuses[-1]:
+    # Convert to keras
+    onnx_model = onnx.load("./temp_320_320.onnx")
+    keras_model = onnx_to_keras(onnx_model=onnx_model, input_names=["input"], change_ordering=True, verbose=False)
+    new_model = tf.keras.Sequential()
+    new_model.add(keras_model)
+    new_model.add(tf.keras.layers.UpSampling2D(size=(8,8), interpolation="bilinear"))
+    new_model.save("keras_320_320")
+    print("Saved keras model!")
 
-#onnx_model = onnx.load("./temp_320_320.onnx")
-#onnx.checker.check_model(onnx_model)
-#print("Model loaded and check done")
-
-#keras_model = onnx_to_keras(onnx_model=onnx_model, input_names=["input"], change_ordering=True, verbose=False)
-#keras_model.save('keras_model_320_320') 
-#print("Saved keras model")
-#prev_model = tf.keras.models.load_model("keras_model_320_320")
-#new_model = tf.keras.Sequential()
-#new_model.add(prev_model)
-#new_model.add(tf.keras.layers.UpSampling2D(size=(8,8), interpolation="bilinear"))
-keras_model = tf.keras.models.load_model("keras_model_320_320_final")
-converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
-converter.experimental_new_converter=False
-converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE] # Performs Quantization
-tflite_model = converter.convert()
-open('model_320_320.tflite', "wb").write(tflite_model)
-print("Saved tflite model!")
-
+if status == statuses[2] or status==statuses[-1]:
+    # Convert to tflite
+    keras_model = tf.keras.models.load_model("keras_320_320")
+    converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
+    converter.experimental_new_converter=False
+    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE] # Performs Quantization
+    tflite_model = converter.convert()
+    open('model_320_320.tflite', "wb").write(tflite_model)
+    print("Saved tflite model!")

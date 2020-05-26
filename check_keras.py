@@ -5,7 +5,7 @@ import torch
 import PIL.Image
 from torch.utils import data
 from dataset import get_segmentation_dataset
-from utils import viewer2 as viewer
+from utils import viewer3 as viewer
 import os
 import numpy.ma as ma
 
@@ -35,23 +35,15 @@ testloader = data.DataLoader(get_segmentation_dataset("idd_train", root="dataset
                              batch_size=1, shuffle=False, pin_memory=True)
 
 confusion_matrix = np.zeros((7, 7))
-    
+
+keras_model = tf.keras.models.load_model('keras_320_320')
+ 
 for index, batch in enumerate(testloader):
     image, label, _ , name = batch
     image = np.array(image)
     # reshape input shape from NCHW to NHWC
     image = np.transpose(image, (0,2,3,1))
-
-    # load model
-    interpreter = tf.lite.Interpreter(model_path="model_320_320.tflite")
-    interpreter.allocate_tensors()
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-    
-    # assign tensors
-    interpreter.set_tensor(input_details[0]['index'], image)
-    interpreter.invoke()
-    output_data = interpreter.get_tensor(output_details[0]['index'])
+    output_data = keras_model.predict(image) 
     seg_pred = np.asarray(np.argmax(output_data, axis=3), dtype=np.uint8)
     m_seg_pred = ma.masked_array(seg_pred, mask=torch.eq(label, 7))
     ma.set_fill_value(m_seg_pred, 7) 

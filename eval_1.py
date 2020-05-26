@@ -214,12 +214,12 @@ def predict_multi_scale(net, image, scales, tile_size, classes, flip_evaluation,
         if scale <= 1.0:
             scaled_probs = predict_whole_img(net, image, classes, method, scale=scale)
         else:        
-            scaled_probs = predict_sliding(net, image, (1024,2048), classes, method, scale=scale)
+            scaled_probs = predict_sliding(net, image, (720,1280), classes, method, scale=scale)
         if flip_evaluation == 'True':
             if scale <= 1.0:
                 flip_scaled_probs = predict_whole_img(net, image[:,:,:,::-1].copy(), classes, method, scale=scale)
             else:
-                flip_scaled_probs = predict_sliding(net, image[:,:,:,::-1].copy(), (1024,2048), classes, method, scale=scale)
+                flip_scaled_probs = predict_sliding(net, image[:,:,:,::-1].copy(), (720,1280), classes, method, scale=scale)
             scaled_probs = 0.5 * (scaled_probs + flip_scaled_probs[:,:,::-1])
         full_probs += scaled_probs
     full_probs /= len(scales)

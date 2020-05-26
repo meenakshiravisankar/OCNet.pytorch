@@ -13,7 +13,7 @@ DATASET="idd_train"
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=40000
+MAX_ITERS=80000
 BATCHSIZE=4
 INPUT_SIZE='720,1280'
 USE_CLASS_BALANCE=True
@@ -39,11 +39,11 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 # testing settings
 TEST_USE_FLIP=False
 TEST_USE_MS=False
-TEST_STORE_RESULT=True
+TEST_STORE_RESULT=False
 TEST_BATCHSIZE=4
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/7/train_26/artifacts/CS_scenes_40000.pth"
+TEST_RESTORE_FROM="mlruns/12/train_00_80/artifacts/CS_scenes_40000.pth"
 
 ########################################################################################################################
 #  Testing
@@ -53,7 +53,7 @@ mkdir -p visualize
 # validation set
 TESTDATASET="idd_train"
 TEST_SET="val"
-TEST_DATA_LIST_PATH="./dataset/list/idd/val_2.lst"
+TEST_DATA_LIST_PATH="./dataset/list/idd/val_1.lst"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
