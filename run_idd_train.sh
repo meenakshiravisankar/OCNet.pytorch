@@ -5,8 +5,8 @@ PYTHON="python3"
 
 
 #network config
-NETWORK="resnet101"
-METHOD="interlaced_dsn"
+NETWORK="mobilenetv2"
+METHOD="baseline"
 DATASET="idd_train"
 NUM_CLASSES=26
 
@@ -14,9 +14,9 @@ NUM_CLASSES=26
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=80000
-BATCHSIZE=4
-INPUT_SIZE='769,769'
+MAX_ITERS=20000
+BATCHSIZE=16
+INPUT_SIZE='768,768'
 USE_CLASS_BALANCE=True
 USE_OHEM=False
 OHEMTHRES=0.7
@@ -30,7 +30,7 @@ EXPERIMENT_NAME="$1"
 # replace the DATA_DIR with your folder path to the dataset.
 DATA_DIR='./dataset/idd'
 DATA_LIST_PATH='./dataset/list/idd/train_1.lst'
-RESTORE_FROM='pretrained_model/resnet101-imagenet.pth'
+RESTORE_FROM='pretrained_model/mobilenetv2-imagenet.pth'
 
 # Set the Output path of checkpoints, training log.
 TRAIN_LOG_DIR="./log/log_train"

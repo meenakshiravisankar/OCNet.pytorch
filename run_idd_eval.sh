@@ -6,14 +6,14 @@ PYTHON="python3"
 
 #network config
 NETWORK="resnet101"
-METHOD="interlaced_dsn"
+METHOD="psp_dsn"
 DATASET="idd_train"
 
 #training settings
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=120000
+MAX_ITERS=80000
 BATCHSIZE=4
 INPUT_SIZE='1080,1920'
 USE_CLASS_BALANCE=True
@@ -43,7 +43,7 @@ TEST_STORE_RESULT=False
 TEST_BATCHSIZE=16
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/15/train_80_120/artifacts/CS_scenes_120000.pth"
+TEST_RESTORE_FROM="mlruns/14/train/artifacts/CS_scenes_80000.pth"
 
 ########################################################################################################################
 #  Testing

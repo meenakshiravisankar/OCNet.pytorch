@@ -107,7 +107,7 @@ def main():
         elif 'mobilenet' in args.network:
             for i in saved_state_dict:
                 i_parts = i.split('.')
-                if not (i_parts[0]=='features' and i_parts[1]=='18') and not i_parts[0]=='classifier':
+                if not (i_parts[0]=='conv') and (i_parts[0]=='features' and i_parts[1]=='18') and not i_parts[0]=='classifier':
                     new_params['.'.join(i_parts[0:])] = saved_state_dict[i] 
         else:
             for i in saved_state_dict:
