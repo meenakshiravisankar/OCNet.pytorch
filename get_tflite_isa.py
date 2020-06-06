@@ -127,21 +127,23 @@ class SelfAttentionBlock2D(nn.Module):
         batch_size, h, w = x.size(0), x.size(2), x.size(3)
         if self.scale > 1:
             x = self.pool(x)
-
-        value = self.f_value(x).view(batch_size, self.value_channels, -1)
+        value = self.f_value(x).reshape(batch_size, self.value_channels, -1)
         value = value.permute(0, 2, 1)
-        query = self.f_query(x).view(batch_size, self.key_channels, -1)
+        query = self.f_query(x).reshape(batch_size, self.key_channels, -1)
         query = query.permute(0, 2, 1)
-        key = self.f_key(x).view(batch_size, self.key_channels, -1)
-
-        sim_map = torch.matmul(query, key)
-        sim_map = (self.key_channels**-.5) * sim_map
-        sim_map = F.softmax(sim_map, dim=-1)
-
-        context = torch.matmul(sim_map, value)
-        context = context.permute(0, 2, 1).contiguous()
-        context = context.view(batch_size, self.value_channels, h, w)
-        context = self.W(context)
+        key = self.f_key(x).reshape(batch_size, self.key_channels, -1)
+        
+        query = query.permute(0, 2, 1)
+        context = torch.cat([query, key], dim=1)
+        context = context.reshape(batch_size, self.value_channels, h, w)
+        #sim_map = torch.matmul(query, key)
+        #sim_map = (self.key_channels**-.5) * sim_map
+        #sim_map = F.softmax(sim_map, dim=-1)
+        #print(sim_map.shape)
+        #context = torch.matmul(sim_map, value)
+        #context = context.permute(0, 2, 1)
+        #context = context.reshape(batch_size, self.value_channels, h, w)
+        #context = self.W(context)
         return context
 
 
@@ -154,36 +156,31 @@ class ISA_Block(nn.Module):
         self.long_range_sa = SelfAttentionBlock2D(in_channels, key_channels, value_channels, out_channels)
         self.short_range_sa = SelfAttentionBlock2D(out_channels, key_channels, value_channels, out_channels)
     
-    def forward(self, x):
+    def forward(self, x, out_h=6, out_w=6, pad_h=7, pad_w=7):
         n, c, h, w = x.size()
+        feats_1 = self.long_range_sa(x)
         dh, dw = self.down_factor       # down_factor for h and w, respectively
+        #out_h, out_w = math.ceil(h / dh), math.ceil(w / dw)
+        #pad_h, pad_w = out_h * dh - h, out_w * dw - w
         
-        out_h, out_w = math.ceil(h / dh), math.ceil(w / dw)
-        # pad the feature if the size is not divisible
-        pad_h, pad_w = out_h * dh - h, out_w * dw - w
-        if pad_h > 0 or pad_w > 0:  # padding in both left&right sides
-            feats = F.pad(x, (pad_w//2, pad_w - pad_w//2, pad_h//2, pad_h - pad_h//2))
-        else:
-            feats = x
+        #feats = F.pad(x, (pad_w//2, pad_w - pad_w//2, pad_h//2, pad_h - pad_h//2))
         
         # long range attention
-        feats = feats.view(n, c, out_h, dh, out_w, dw)
-        feats = feats.permute(0, 3, 5, 1, 2, 4).contiguous().view(-1, c, out_h, out_w)
-        feats = self.long_range_sa(feats)
-        c = self.out_channels
+        #feats = feats.view(n, c, out_h, dh, out_w, dw)
+        #feats = feats.permute(0, 3, 5, 1, 2, 4).contiguous().view(-1, c, out_h, out_w)
+        #feats = self.long_range_sa(feats)
+        #c = self.out_channels
 
         # short range attention
-        feats = feats.view(n, dh, dw, c, out_h, out_w)
-        feats = feats.permute(0, 4, 5, 3, 1, 2).contiguous().view(-1, c, dh, dw)
-        feats = self.short_range_sa(feats)
-        feats = feats.view(n, out_h, out_w, c, dh, dw).permute(0, 3, 1, 4, 2, 5)
-        feats = feats.contiguous().view(n, c, dh * out_h, dw * out_w)
+        #feats = feats.view(n, dh, dw, c, out_h, out_w)
+        #feats = feats.permute(0, 4, 5, 3, 1, 2).contiguous().view(-1, c, dh, dw)
+        #feats = self.short_range_sa(feats)
+        #feats = feats.view(n, out_h, out_w, c, dh, dw).permute(0, 3, 1, 4, 2, 5)
+        #feats = feats.contiguous().view(n, c, dh * out_h, dw * out_w)
 
         # remove padding
-        if pad_h > 0 or pad_w > 0:
-            feats = feats[:, :, pad_h//2:pad_h//2 + h, pad_w//2:pad_w//2 + w]
-        
-        return feats
+        #feats = feats[:, :, 3:44, 3:44]
+        return feats_1
 
 
 class ISA_Module(nn.Module):
@@ -310,7 +307,7 @@ def check_onnx(x, output, path="temp_320_320_interlaced.onnx"):
 random.seed(42)
 
 statuses = ["onnx", "keras", "tflite", "all"]
-status = "onnx"
+status ="all"
 
 if status == statuses[0] or status == statuses[-1]:
     restore_from = "mlruns/6/train_40_80/artifacts/CS_scenes_80000.pth"
@@ -330,12 +327,12 @@ if status == statuses[0] or status == statuses[-1]:
     torch.onnx.export(torch_model, x, "./temp_320_320_interlaced.onnx", opset_version=11, 
                       input_names=["input"], output_names=["output"])
     print("Onnx exported")
-    check_onnx(x, output, "temp_320_320_interlaced.onnx")
+    #check_onnx(x, output, "temp_320_320_interlaced.onnx")
 
 if status == statuses[1] or status==statuses[-1]:
     # Convert to keras
     onnx_model = onnx.load("./temp_320_320_interlaced.onnx")
-    keras_model = onnx_to_keras(onnx_model=onnx_model, input_names=["input"], change_ordering=True, verbose=False)
+    keras_model = onnx_to_keras(onnx_model=onnx_model, input_names=["input"], change_ordering=True, verbose=True)
     new_model = tf.keras.Sequential()
     new_model.add(keras_model)
     new_model.add(tf.keras.layers.UpSampling2D(size=(8,8), interpolation="bilinear"))

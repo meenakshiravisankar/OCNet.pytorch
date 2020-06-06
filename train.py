@@ -122,12 +122,11 @@ def main():
     
 
     model = DataParallelModel(deeplab)
-    # model = nn.DataParallel(deeplab)
     model.train()     
     model.float()
     model.cuda()    
 
-    #criterion = CriterionCrossEntropy()
+    criterion = CriterionCrossEntropy()
     
     if "dsn" in args.method:
         if args.ohem:
@@ -139,7 +138,7 @@ def main():
         else:
             criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=True)
 
-    criterion = CriterionFocalLoss()
+    #criterion = CriterionFocalLoss()
     criterion = DataParallelCriterion(criterion)
     criterion.cuda()
     cudnn.benchmark = True

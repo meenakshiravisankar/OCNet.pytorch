@@ -19,7 +19,8 @@ import numpy.ma as ma
 import sys
 import pdb
 import torch
-
+import PIL.Image
+import PIL
 from torch.autograd import Variable
 import torchvision.models as models
 import torch.nn.functional as F
@@ -457,8 +458,8 @@ def main():
                     os.makedirs(output_path+dir_name)
                 output_im.save(output_path+dir_name+'/'+img_name)
                 mlflow.log_artifact(output_path+dir_name+'/'+img_name)
-        seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
-        ignore_index = seg_gt != 26 # dataset specific
+        seg_gt = np.asarray(label.numpy()[:,:,:], dtype=np.int)
+        ignore_index = seg_gt!=26
         seg_gt = seg_gt[ignore_index]
         seg_pred = seg_pred[ignore_index]
         seg_pred_2 = seg_pred_2[ignore_index]

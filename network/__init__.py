@@ -5,7 +5,7 @@ from .resnet101_asp_oc import get_resnet101_asp_oc_dsn
 from .resnet101_interlaced import get_resnet101_interlaced_dsn
 from .resnet101_interlaced import get_resnet101_interlaced_dsn_inf
 from .resnet101_base_oc import get_resnet101_base_oc_dsn_inf
-
+from .resnet101_psp import get_resnet101_psp_dsn
 
 networks = {
     'resnet101_baseline': get_resnet101_baseline,
@@ -14,8 +14,8 @@ networks = {
     'resnet101_asp_oc_dsn': get_resnet101_asp_oc_dsn,
     'resnet101_interlaced_dsn' : get_resnet101_interlaced_dsn,
     'resnet101_interlaced_dsn_inf' : get_resnet101_interlaced_dsn_inf,
-    'resnet101_base_oc_dsn_inf': get_resnet101_base_oc_dsn_inf
-
+    'resnet101_base_oc_dsn_inf': get_resnet101_base_oc_dsn_inf,
+    'resnet101_psp_dsn' : get_resnet101_psp_dsn
 }
 
 def get_segmentation_model(name, **kwargs):

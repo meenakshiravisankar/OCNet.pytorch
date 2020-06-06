@@ -157,7 +157,7 @@ statuses = ["onnx", "keras", "tflite", "all"]
 status = "tflite"
 
 if status == statuses[0] or status == statuses[-1]:
-    restore_from = "mlruns/11/train_00_80/artifacts/CS_scenes_80000.pth"
+    restore_from = "prune_g25.pth"
     torch_model = get_resnet101_baseline(num_classes=7)
     saved_state_dict = torch.load(restore_from, map_location=torch.device('cpu'))
     torch_model.load_state_dict(saved_state_dict)
@@ -191,7 +191,7 @@ if status == statuses[2] or status==statuses[-1]:
     keras_model = tf.keras.models.load_model("keras_320_320")
     converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
     converter.experimental_new_converter=False
-    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE] # Performs Quantization
+    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY] # Performs Quantization
     tflite_model = converter.convert()
     open('model_320_320.tflite', "wb").write(tflite_model)
     print("Saved tflite model!")

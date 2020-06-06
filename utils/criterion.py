@@ -18,13 +18,13 @@ torch_ver = torch.__version__[:3]
 
 class FocalLoss(nn.Module):
     ''' Focal loss for classification tasks on imbalanced datasets '''
-    def __init__(self, gamma=2, ignore_index=26, reduction='mean'):
+    def __init__(self, gamma=1.5, ignore_index=26, reduction='mean'):
         super(FocalLoss, self).__init__()
         self.reduction = reduction
         self.gamma = gamma
         self.ignore_index = ignore_index
         weight = torch.FloatTensor([0.846,0.907, 0.987, 0.986, 1.025, 1.009, 0.988, 1.235, 0.995, 0.925, 0.965, 0.976, 1.079,0.983, 0.943, 1.021, 1.133, 0.965, 1.156, 1.334, 0.99,  0.924, 0.896, 1.009, 0.858,0.867])
-        self.criterion = torch.nn.CrossEntropyLoss(weight=weight, ignore_index=ignore_index)
+        self.criterion = torch.nn.CrossEntropyLoss(weight=None, ignore_index=ignore_index)
 
     def forward(self, pred, target):
         cross_entropy = self.criterion(pred, target)
