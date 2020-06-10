@@ -425,7 +425,7 @@ def main():
                     os.makedirs(output_path+dir_name)
                 output_im.save(output_path+dir_name+'/'+img_name)
                 mlflow.log_artifact(output_path+dir_name+'/'+img_name)
-        seg_gt = np.asarray(label.numpy()[:,:size[0],:size[1]], dtype=np.int)
+        seg_gt = np.asarray(label.numpy()[:,:,:], dtype=np.int)
         ignore_index = seg_gt != ignore_label # dataset specific
         seg_gt = seg_gt[ignore_index]
         seg_pred = seg_pred[ignore_index]

@@ -5,6 +5,7 @@ from .resnet101_asp_oc import get_resnet101_asp_oc_dsn
 from .resnet101_interlaced import get_resnet101_interlaced_dsn
 from .resnet101_interlaced import get_resnet101_interlaced_dsn_inf
 from .resnet101_base_oc import get_resnet101_base_oc_dsn_inf
+from .mobilenetv2_baseline import get_mobilenetv2_baseline
 
 
 networks = {
@@ -14,8 +15,8 @@ networks = {
     'resnet101_asp_oc_dsn': get_resnet101_asp_oc_dsn,
     'resnet101_interlaced_dsn' : get_resnet101_interlaced_dsn,
     'resnet101_interlaced_dsn_inf' : get_resnet101_interlaced_dsn_inf,
-    'resnet101_base_oc_dsn_inf': get_resnet101_base_oc_dsn_inf
-
+    'resnet101_base_oc_dsn_inf': get_resnet101_base_oc_dsn_inf,
+    'mobilenetv2_baseline' : get_mobilenetv2_baseline
 }
 
 def get_segmentation_model(name, **kwargs):
