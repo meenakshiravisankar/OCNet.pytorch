@@ -8,6 +8,8 @@ import math
 torch_ver = torch.__version__[:3]
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
+sys.path.append(os.path.join(BASE_DIR, '../oc_module'))
+from base_oc_block_interlaced import ISA_Module
 
 if torch_ver == '0.4':
     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn'))
@@ -116,12 +118,15 @@ class MobileNetV2(nn.Module):
         self.features = nn.Sequential(*self.features)
         # baseline
         self.layer = nn.Sequential(conv_bn(1280, 2048, 1), conv_bn(2048, 512, 1)) 
+        self.context = nn.Sequential(ISA_Module(in_channels=512, key_channels=256, value_channels=512,
+                        out_channels=512, down_factors=[[8,8]], dropout=0.05))
         self.cls = nn.Conv2d(512, n_class, kernel_size=1, stride=1, padding=0, bias=True)
         self._initialize_weights()
 
     def forward(self, x):
         x = self.features(x)
         x = self.layer(x)
+        x = self.context(x)
         x = self.cls(x)
         return x
 
