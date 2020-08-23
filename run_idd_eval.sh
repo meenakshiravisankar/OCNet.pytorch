@@ -5,7 +5,7 @@ PYTHON="python3"
 
 
 #network config
-NETWORK="resnet101"
+NETWORK="mobilenetv2"
 METHOD="baseline"
 DATASET="idd_train"
 
@@ -13,7 +13,7 @@ DATASET="idd_train"
 LEARNING_RATE=5e-3
 WEIGHT_DECAY=5e-4
 START_ITERS=0
-MAX_ITERS=80000
+MAX_ITERS=40000
 BATCHSIZE=4
 INPUT_SIZE='720,1280'
 USE_CLASS_BALANCE=True
@@ -40,10 +40,10 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 TEST_USE_FLIP=False
 TEST_USE_MS=False
 TEST_STORE_RESULT=False
-TEST_BATCHSIZE=4
+TEST_BATCHSIZE=16
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="mlruns/11/train_00_80/artifacts/CS_scenes_80000.pth"
+TEST_RESTORE_FROM="checkpoint/snapshots_mobilenetv2_baseline_7e-3_5e-4_8_40000/CS_scenes_40000.pth"
 
 ########################################################################################################################
 #  Testing
